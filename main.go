@@ -2,58 +2,68 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 )
 
-type Links struct {
-	Artists   string `json:"artists"`
-	Locations string `json:"locations"`
-	Dates     string `json:"dates"`
-	Relation  string `json:"relation"`
+type Artist struct {
+	ID           int      `json:"id"`
+	Image        string   `json:"image"`
+	Name         string   `json:"name"`
+	Members      []string `json:"members"`
+	CreationDate int      `json:"creationDate"`
+	FirstAlbum   string   `json:"firstAlbum"`
+	Locations    string   `json:"locations"`
+	ConcertDates string   `json:"concertDates"`
+	Relations    string   `json:"relations"`
 }
+
+var artists []Artist
 
 func main() {
-	// URL de l'API
-	apiURL := "https://groupietrackers.herokuapp.com/api"
-
-	// Faire une requête GET à l'API
-	response, err := http.Get(apiURL)
-	if err != nil {
-		fmt.Println("Erreur lors de la requête :", err)
-		return
-	}
-	defer response.Body.Close()
-
-	// Structure pour stocker les liens
-	var links Links
-
-	// Décoder les données JSON
-	err = json.NewDecoder(response.Body).Decode(&links)
-	if err != nil {
-		fmt.Println("Erreur lors du décodage des données JSON :", err)
-		return
+	artists = []Artist{
+		{
+			ID:           1,
+			Name:         "Queen",
+			Members:      []string{"Freddie Mercury", "Brian May", "John Daecon", "Roger Meddows-Taylor", "Mike Grose", "Barry Mitchell", "Doug Fogie"},
+			CreationDate: 1970,
+			FirstAlbum:   "14-12-1973",
+			Locations:    "https://groupietrackers.herokuapp.com/api/locations/1",
+			ConcertDates: "https://groupietrackers.herokuapp.com/api/dates/1",
+			Relations:    "https://groupietrackers.herokuapp.com/api/relation/1",
+		},
 	}
 
-	// Afficher les liens
-	fmt.Println("Artists:", links.Artists)
-	fmt.Println("Locations:", links.Locations)
-	fmt.Println("Dates:", links.Dates)
-	fmt.Println("Relation:", links.Relation)
+	http.HandleFunc("/search", searchHandler)
+	http.ListenAndServe(":8080", nil)
 }
 
-func GetidArtists() {
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
 
+	if query == "" {
+		http.Error(w, "Le terme de recherche est vide", http.StatusBadRequest)
+		return
+	}
+
+	results := searchArtistsByName(query)
+
+	response, err := json.Marshal(results)
+	if err != nil {
+		http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(response)
 }
 
-func GetidLocation() {
-
-}
-
-func GetidRelation() {
-
-}
-
-func searchid() {
-
+func searchArtistsByName(query string) []Artist {
+	var results []Artist
+	for _, artist := range artists {
+		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
+			results = append(results, artist)
+		}
+	}
+	return results
 }
