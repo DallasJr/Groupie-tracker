@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -21,47 +22,70 @@ type Artist struct {
 var artists []Artist
 
 func main() {
-	artists = []Artist{
-		{
-			ID:           1,
-			Name:         "Queen",
-			Members:      []string{"Freddie Mercury", "Brian May", "John Daecon", "Roger Meddows-Taylor", "Mike Grose", "Barry Mitchell", "Doug Fogie"},
-			CreationDate: 1970,
-			FirstAlbum:   "14-12-1973",
-			Locations:    "https://groupietrackers.herokuapp.com/api/locations/1",
-			ConcertDates: "https://groupietrackers.herokuapp.com/api/dates/1",
-			Relations:    "https://groupietrackers.herokuapp.com/api/relation/1",
-		},
-	}
+	URL := "https://groupietrackers.herokuapp.com/api/artists"
 
-	http.HandleFunc("/search", searchHandler)
-	http.ListenAndServe(":8080", nil)
-}
-
-func searchHandler(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Get("q")
-
-	if query == "" {
-		http.Error(w, "Le terme de recherche est vide", http.StatusBadRequest)
-		return
-	}
-
-	results := searchArtistsByName(query)
-
-	response, err := json.Marshal(results)
+	// Faire une requête GET à l'API
+	response, err := http.Get(URL)
 	if err != nil {
-		http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+		fmt.Println("Erreur lors de la requête :", err)
+		return
+	}
+	defer response.Body.Close()
+
+	// Vérifier le code de statut de la réponse
+	if response.StatusCode != http.StatusOK {
+		fmt.Println("La requête a retourné un code de statut non-200 :", response.StatusCode)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(response)
+	// Décoder les données JSON
+	err = json.NewDecoder(response.Body).Decode(&artists)
+	if err != nil {
+		fmt.Println("Erreur lors du décodage des données JSON :", err)
+		return
+	}
+
+	// Exemples de recherches
+	fmt.Println("Recherche par nom:")
+	fmt.Println(SearchArtistsByName("Queen"))
+
+	fmt.Println("\nRecherche par membre:")
+	fmt.Println(SearchArtistsByMember("Freddie Mercury"))
+
+	fmt.Println("\nRecherche par année de création:")
+	fmt.Println(SearchArtistsByCreationYear(1970))
 }
 
-func searchArtistsByName(query string) []Artist {
+// Recherche d'artistes par nom
+func SearchArtistsByName(query string) []Artist {
 	var results []Artist
 	for _, artist := range artists {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
+			results = append(results, artist)
+		}
+	}
+	return results
+}
+
+// Recherche d'artistes par membre
+func SearchArtistsByMember(query string) []Artist {
+	var results []Artist
+	for _, artist := range artists {
+		for _, member := range artist.Members {
+			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
+				results = append(results, artist)
+				break
+			}
+		}
+	}
+	return results
+}
+
+// Recherche d'artistes par année de création
+func SearchArtistsByCreationYear(year int) []Artist {
+	var results []Artist
+	for _, artist := range artists {
+		if artist.CreationDate == year {
 			results = append(results, artist)
 		}
 	}
