@@ -1,4 +1,4 @@
-package dates
+package structs
 
 type Dates struct {
 	id    int

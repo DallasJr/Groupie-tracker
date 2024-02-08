@@ -1,4 +1,4 @@
-package relation
+package structs
 
 type Relation struct {
 	id             int
