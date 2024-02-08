@@ -19,9 +19,10 @@ type Artist struct {
 	Relations    string   `json:"relations"`
 }
 
-var artists []Artist
+var artist []Artist
 
 func main() {
+
 	URL := "https://groupietrackers.herokuapp.com/api/artists"
 
 	// Faire une requête GET à l'API
@@ -39,27 +40,79 @@ func main() {
 	}
 
 	// Décoder les données JSON
-	err = json.NewDecoder(response.Body).Decode(&artists)
+	err = json.NewDecoder(response.Body).Decode(&artist)
 	if err != nil {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
-
-	// Exemples de recherches
 	fmt.Println("Recherche par nom:")
-	fmt.Println(SearchArtistsByName("Queen"))
+	searchByName("Queen")
 
 	fmt.Println("\nRecherche par membre:")
-	fmt.Println(SearchArtistsByMember("Freddie Mercury"))
+	searchByMember("Freddie Mercury")
 
 	fmt.Println("\nRecherche par année de création:")
-	fmt.Println(SearchArtistsByCreationYear(1970))
+	searchByCreationYear(1970)
+}
+
+func searchByName(query string) {
+	results := SearchArtistsByName(query)
+	for _, artist := range results {
+		printArtistInfo(artist)
+	}
+}
+
+func searchByMember(query string) {
+	results := SearchArtistsByMember(query)
+	for _, artist := range results {
+		printArtistInfo(artist)
+	}
+}
+
+func searchByCreationYear(year int) {
+	results := SearchArtistsByCreationYear(year)
+	for _, artist := range results {
+		printArtistInfo(artist)
+	}
+}
+
+func printArtistInfo(artist Artist) {
+	fmt.Println("ID:", artist.ID)
+	fmt.Println("Image:", artist.Image)
+	fmt.Println("Nom:", artist.Name)
+	fmt.Println("Membres:", strings.Join(artist.Members, ", "))
+	fmt.Println("Date de création:", artist.CreationDate)
+	fmt.Println("Premier album:", artist.FirstAlbum)
+}
+
+func getArtistInfo(url string) {
+	data, err := fetchData(url)
+	if err != nil {
+		fmt.Println("Erreur lors de la récupération des données depuis", url, ":", err)
+		return
+	}
+	fmt.Println(data)
+}
+
+func fetchData(url string) (interface{}, error) {
+	response, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	var data interface{}
+	err = json.NewDecoder(response.Body).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 // Recherche d'artistes par nom
 func SearchArtistsByName(query string) []Artist {
 	var results []Artist
-	for _, artist := range artists {
+	for _, artist := range artist {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
 			results = append(results, artist)
 		}
@@ -70,7 +123,7 @@ func SearchArtistsByName(query string) []Artist {
 // Recherche d'artistes par membre
 func SearchArtistsByMember(query string) []Artist {
 	var results []Artist
-	for _, artist := range artists {
+	for _, artist := range artist {
 		for _, member := range artist.Members {
 			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
 				results = append(results, artist)
@@ -84,7 +137,7 @@ func SearchArtistsByMember(query string) []Artist {
 // Recherche d'artistes par année de création
 func SearchArtistsByCreationYear(year int) []Artist {
 	var results []Artist
-	for _, artist := range artists {
+	for _, artist := range artist {
 		if artist.CreationDate == year {
 			results = append(results, artist)
 		}
