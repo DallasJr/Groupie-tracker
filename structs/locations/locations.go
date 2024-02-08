@@ -1,6 +1,8 @@
 package locations
 
-import "groupie-tracker/dates"
+import (
+	"groupie-tracker/structs/dates"
+)
 
 type Locations struct {
 	id        int

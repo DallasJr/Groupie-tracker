@@ -1,9 +1,9 @@
 package artists
 
 import (
-	"groupie-tracker/dates"
-	"groupie-tracker/locations"
-	"groupie-tracker/relation"
+	"groupie-tracker/structs/dates"
+	"groupie-tracker/structs/locations"
+	"groupie-tracker/structs/relation"
 )
 
 type Artists struct {
