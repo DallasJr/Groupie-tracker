@@ -2,17 +2,15 @@ package mainPage
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"groupie-tracker/pages/artistPage"
 	"image/color"
 )
 
-func LoadPage() {
-	myApp := app.New()
-	myWindow := myApp.NewWindow("Groupie Tracker")
+func LoadPage(myWindow fyne.Window) {
 
 	titleLabel := canvas.NewText("Groupie Tracker", color.White)
 	titleLabel.TextSize = 50
@@ -22,7 +20,7 @@ func LoadPage() {
 	searchEntry.SetPlaceHolder("Search here")
 
 	searchButton := widget.NewButtonWithIcon("", theme.MailForwardIcon(), func() {
-
+		artistPage.LoadPage(myWindow)
 	})
 
 	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
@@ -38,5 +36,4 @@ func LoadPage() {
 	))
 	myWindow.SetContent(content)
 	myWindow.Resize(fyne.NewSize(800, 500))
-	myWindow.ShowAndRun()
 }

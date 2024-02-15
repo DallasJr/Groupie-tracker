@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
-	mainPage "groupie-tracker/pages"
+	"fyne.io/fyne/v2/app"
+	"groupie-tracker/pages/mainPage"
 )
 
 func main() {
 	fmt.Println("Launching app . . .")
-	mainPage.LoadPage()
+	myApp := app.New()
+	myWindow := myApp.NewWindow("Groupie Tracker")
+	mainPage.LoadPage(myWindow)
+	myWindow.ShowAndRun()
 }
