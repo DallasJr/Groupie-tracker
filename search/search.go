@@ -22,7 +22,7 @@ type Artist struct {
 
 var artists []Artist
 
-func main() {
+func Load() {
 
 	URL := "https://groupietrackers.herokuapp.com/api/artists"
 
@@ -46,21 +46,6 @@ func main() {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
-
-	fmt.Println("Recherche par nom:")
-	fmt.Println(Search("Queen"))
-
-	fmt.Println("\nRecherche par membre:")
-	fmt.Println(Search("Freddie Mercury"))
-
-	fmt.Println("\nRecherche par année de création:")
-	fmt.Print(Search("1970"))
-
-	fmt.Println("\nRecherche générique:")
-	fmt.Println(Search("Freddie Mercury"))
-
-	suggestions := GetSuggestions("m")
-	fmt.Println("Suggestions:", suggestions)
 }
 
 // Recherche d'artistes par nom
