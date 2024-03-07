@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ type Artist struct {
 	Relations    string   `json:"relations"`
 }
 
-var artist []Artist
+var artists []Artist
 
 func main() {
 
@@ -40,79 +41,32 @@ func main() {
 	}
 
 	// Décoder les données JSON
-	err = json.NewDecoder(response.Body).Decode(&artist)
+	err = json.NewDecoder(response.Body).Decode(&artists)
 	if err != nil {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
+
 	fmt.Println("Recherche par nom:")
-	searchByName("Queen")
+	fmt.Println(Search("Queen"))
 
 	fmt.Println("\nRecherche par membre:")
-	searchByMember("Freddie Mercury")
+	fmt.Println(Search("Freddie Mercury"))
 
 	fmt.Println("\nRecherche par année de création:")
-	searchByCreationYear(1970)
-}
+	fmt.Print(Search("1970"))
 
-func searchByName(query string) {
-	results := SearchArtistsByName(query)
-	for _, artist := range results {
-		printArtistInfo(artist)
-	}
-}
+	fmt.Println("\nRecherche générique:")
+	fmt.Println(Search("Freddie Mercury"))
 
-func searchByMember(query string) {
-	results := SearchArtistsByMember(query)
-	for _, artist := range results {
-		printArtistInfo(artist)
-	}
-}
-
-func searchByCreationYear(year int) {
-	results := SearchArtistsByCreationYear(year)
-	for _, artist := range results {
-		printArtistInfo(artist)
-	}
-}
-
-func printArtistInfo(artist Artist) {
-	fmt.Println("ID:", artist.ID)
-	fmt.Println("Image:", artist.Image)
-	fmt.Println("Nom:", artist.Name)
-	fmt.Println("Membres:", strings.Join(artist.Members, ", "))
-	fmt.Println("Date de création:", artist.CreationDate)
-	fmt.Println("Premier album:", artist.FirstAlbum)
-}
-
-func getArtistInfo(url string) {
-	data, err := fetchData(url)
-	if err != nil {
-		fmt.Println("Erreur lors de la récupération des données depuis", url, ":", err)
-		return
-	}
-	fmt.Println(data)
-}
-
-func fetchData(url string) (interface{}, error) {
-	response, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	var data interface{}
-	err = json.NewDecoder(response.Body).Decode(&data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	suggestions := GetSuggestions("m")
+	fmt.Println("Suggestions:", suggestions)
 }
 
 // Recherche d'artistes par nom
 func SearchArtistsByName(query string) []Artist {
 	var results []Artist
-	for _, artist := range artist {
+	for _, artist := range artists {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
 			results = append(results, artist)
 		}
@@ -123,7 +77,7 @@ func SearchArtistsByName(query string) []Artist {
 // Recherche d'artistes par membre
 func SearchArtistsByMember(query string) []Artist {
 	var results []Artist
-	for _, artist := range artist {
+	for _, artist := range artists {
 		for _, member := range artist.Members {
 			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
 				results = append(results, artist)
@@ -137,10 +91,71 @@ func SearchArtistsByMember(query string) []Artist {
 // Recherche d'artistes par année de création
 func SearchArtistsByCreationYear(year int) []Artist {
 	var results []Artist
-	for _, artist := range artist {
+	for _, artist := range artists {
 		if artist.CreationDate == year {
 			results = append(results, artist)
 		}
 	}
 	return results
+}
+
+// Recherche d'artistes générique
+func Search(query string) []Artist {
+	var results []Artist
+
+	// Recherche par nom d'artiste
+	nameResults := SearchArtistsByName(query)
+	results = append(results, nameResults...)
+
+	// Recherche par membre
+	memberResults := SearchArtistsByMember(query)
+	results = append(results, memberResults...)
+
+	// Recherche par année de création (si la requête est un nombre)
+	if year, err := strconv.Atoi(query); err == nil {
+		yearResults := SearchArtistsByCreationYear(year)
+		results = append(results, yearResults...)
+	}
+
+	// Recherche par d'autres champs comme les localisations, les dates de concert, etc.
+	for _, artist := range artists {
+		if strings.Contains(strings.ToLower(artist.Locations), strings.ToLower(query)) ||
+			strings.Contains(strings.ToLower(artist.ConcertDates), strings.ToLower(query)) ||
+			strings.Contains(strings.ToLower(artist.Relations), strings.ToLower(query)) {
+			results = append(results, artist)
+		}
+	}
+
+	// Supprimer les doublons potentiels
+	results = removeDuplicates(results)
+
+	return results
+}
+
+// Fonction utilitaire pour supprimer les doublons dans la liste des artistes
+func removeDuplicates(artists []Artist) []Artist {
+	encountered := map[int]bool{}
+	var result []Artist
+
+	for _, artist := range artists {
+		if !encountered[artist.ID] {
+			encountered[artist.ID] = true
+			result = append(result, artist)
+		}
+	}
+
+	return result
+}
+
+func GetSuggestions(query string) []string {
+	var suggestions []string
+
+	for _, artist := range artists {
+		// Vérifier si le nom de l'artiste contient la chaîne de caractères de la requête
+		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
+			suggestions = append(suggestions, artist.Name)
+		}
+	}
+
+	return suggestions
 }
