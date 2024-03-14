@@ -6,8 +6,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"fyne.io/x/fyne/layout"	
-	"groupie-tracker/pages/artistPage"
+	"groupie-tracker/structs"
 	"image/color"
 )
 
@@ -17,13 +16,11 @@ func LoadPage(myWindow fyne.Window) {
 	titleLabel.TextSize = 50
 	titleContainer := container.NewCenter(titleLabel)
 
-	layout.NewResponsiveLayout()
-
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
 
 	searchButton := widget.NewButtonWithIcon("", theme.MailForwardIcon(), func() {
-		artistPage.LoadPage(myWindow)
+		structs.Load()
 	})
 
 	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
@@ -80,6 +77,7 @@ func LoadPage(myWindow fyne.Window) {
 		inputContainer,
 		filterContainer,
 	))
+
 	myWindow.SetContent(content)
 	myWindow.Resize(fyne.NewSize(800, 500))
 }

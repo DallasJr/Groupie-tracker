@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"groupie-tracker/.idea/filtre"
-	"groupie-tracker/pages/mainPage"
-	"groupie-tracker/search"
-
 	"fyne.io/fyne/v2/app"
+	"groupie-tracker/filtre"
+	"groupie-tracker/pages/mainPage"
+	"groupie-tracker/structs"
 )
 
 func main() {
-	search.Load()
+	structs.Load()
 	filtre.CreateFiltersUI(filtre.NewFilters())
 	fmt.Println("Launching app . . .")
 	myApp := app.New()

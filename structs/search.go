@@ -1,4 +1,4 @@
-package search
+package structs
 
 import (
 	"encoding/json"
@@ -145,3 +145,7 @@ func GetSuggestions(query string) []string {
 
 	return suggestions
 }
+
+//func GetContain(query string) string {
+//	container.New()
+//}
