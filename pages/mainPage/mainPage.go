@@ -1,13 +1,15 @@
 package mainPage
 
 import (
+	"groupie-tracker/.idea/filtre" // Importez le package filtre ici
+	"groupie-tracker/pages/artistPage"
+	"image/color"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"groupie-tracker/pages/artistPage"
-	"image/color"
 )
 
 func LoadPage(myWindow fyne.Window) {
@@ -22,6 +24,11 @@ func LoadPage(myWindow fyne.Window) {
 	searchButton := widget.NewButtonWithIcon("", theme.MailForwardIcon(), func() {
 		artistPage.LoadPage(myWindow)
 	})
+
+	// Créez les filtres
+	filters := filtre.NewFilters()
+	filtersUI := filtre.CreateFiltersUI(filters)
+	myWindow.SetContent(filtersUI) // Définissez le contenu de la fenêtre avec les filtres
 
 	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
 	searchEntry.Move(fyne.NewPos(-40, 0))

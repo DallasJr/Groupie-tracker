@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"groupie-tracker/.idea/filtre"
 	"groupie-tracker/pages/mainPage"
 	"groupie-tracker/search"
 
@@ -10,9 +11,11 @@ import (
 
 func main() {
 	search.Load()
+	filtersUI := filtre.CreateFiltersUI(filtre.NewFilters())
 	fmt.Println("Launching app . . .")
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Groupie Tracker")
 	mainPage.LoadPage(myWindow)
+	myWindow.SetContent(filtersUI)
 	myWindow.ShowAndRun()
 }
