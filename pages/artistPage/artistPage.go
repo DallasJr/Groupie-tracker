@@ -13,7 +13,7 @@ func LoadPage(myWindow fyne.Window) {
 	m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "wave-square")
 	img := m.GetImg()
 	fyneImg := canvas.NewImageFromImage(img)
-	content := container.NewMax(fyneImg)
+	content := container.NewStack(fyneImg)
 
 	myWindow.SetContent(content)
 	myWindow.Resize(fyne.NewSize(800, 500))

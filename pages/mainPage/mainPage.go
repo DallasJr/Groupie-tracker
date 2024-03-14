@@ -1,14 +1,14 @@
 package mainPage
 
 import (
-	"groupie-tracker/pages/artistPage"
-	"image/color"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"fyne.io/x/fyne/layout"	
+	"groupie-tracker/pages/artistPage"
+	"image/color"
 )
 
 func LoadPage(myWindow fyne.Window) {
@@ -16,6 +16,8 @@ func LoadPage(myWindow fyne.Window) {
 	titleLabel := canvas.NewText("Groupie Tracker", color.White)
 	titleLabel.TextSize = 50
 	titleContainer := container.NewCenter(titleLabel)
+
+	layout.NewResponsiveLayout()
 
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
