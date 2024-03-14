@@ -1,7 +1,6 @@
 package mainPage
 
 import (
-	// Importez le package filtre ici
 	"groupie-tracker/pages/artistPage"
 	"image/color"
 
@@ -51,17 +50,19 @@ func LoadPage(myWindow fyne.Window) {
 
 	locations := container.NewVBox(
 		widget.NewLabel("Locations"),
-		widget.NewCheck("USA", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		// Add more locations as needed
+		container.NewHBox(
+			widget.NewCheck("USA", func(checked bool) {}),
+			widget.NewCheck("UK", func(checked bool) {}),
+			widget.NewCheck("FR", func(checked bool) {}),
+		),
 	)
 
 	applyButton := widget.NewButton("Apply Filters", func() {
-		// Handle applying filters
+
 	})
 
 	resetButton := widget.NewButton("Reset Filters", func() {
-		// Handle resetting filters
+
 	})
 
 	filterContainer := container.NewVBox(

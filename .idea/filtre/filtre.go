@@ -6,7 +6,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// Define your filter struct to hold filter values
 type Filters struct {
 	CreationDateMin float64
 	CreationDateMax float64
@@ -16,12 +15,10 @@ type Filters struct {
 	Locations       []string
 }
 
-// Function to create a new Filters instance
 func NewFilters() *Filters {
 	return &Filters{}
 }
 
-// Function to create a UI for filters
 func CreateFiltersUI(f *Filters) fyne.CanvasObject {
 	creationDateRange := container.NewVBox(
 		widget.NewLabel("Creation Date Range"),
@@ -44,7 +41,11 @@ func CreateFiltersUI(f *Filters) fyne.CanvasObject {
 		widget.NewLabel("Locations"),
 		widget.NewCheck("USA", func(checked bool) { /* Update filter values */ }),
 		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		// Add more locations as needed
+		widget.NewCheck("FR", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
 	)
 
 	applyButton := widget.NewButton("Apply Filters", func() {
