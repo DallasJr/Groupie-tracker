@@ -22,6 +22,7 @@ type Artist struct {
 
 var artists []Artist
 
+// refaire le load pour qu'il soit dinamique avec ce lien
 func Load() {
 
 	URL := "https://groupietrackers.herokuapp.com/api/artists"
