@@ -1,7 +1,7 @@
 package mainPage
 
 import (
-	"groupie-tracker/.idea/filtre" // Importez le package filtre ici
+	// Importez le package filtre ici
 	"groupie-tracker/pages/artistPage"
 	"image/color"
 
@@ -25,11 +25,6 @@ func LoadPage(myWindow fyne.Window) {
 		artistPage.LoadPage(myWindow)
 	})
 
-	// Créez les filtres
-	filters := filtre.NewFilters()
-	filtersUI := filtre.CreateFiltersUI(filters)
-	myWindow.SetContent(filtersUI) // Définissez le contenu de la fenêtre avec les filtres
-
 	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
 	searchEntry.Move(fyne.NewPos(-40, 0))
 	searchButton.Resize(fyne.NewSize(searchButton.MinSize().Width, searchButton.MinSize().Height))
@@ -37,9 +32,50 @@ func LoadPage(myWindow fyne.Window) {
 
 	inputContainer := container.NewWithoutLayout(searchEntry, searchButton)
 
+	creationDateRange := container.NewVBox(
+		widget.NewLabel("Creation Date Range"),
+		widget.NewSlider(0, 2024),
+		widget.NewSlider(0, 2024),
+	)
+
+	firstAlbumRange := container.NewVBox(
+		widget.NewLabel("First Album Date Range"),
+		widget.NewSlider(0, 2024),
+		widget.NewSlider(0, 2024),
+	)
+
+	numMembers := container.NewVBox(
+		widget.NewLabel("Number of Members"),
+		widget.NewEntry(),
+	)
+
+	locations := container.NewVBox(
+		widget.NewLabel("Locations"),
+		widget.NewCheck("USA", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
+		// Add more locations as needed
+	)
+
+	applyButton := widget.NewButton("Apply Filters", func() {
+		// Handle applying filters
+	})
+
+	resetButton := widget.NewButton("Reset Filters", func() {
+		// Handle resetting filters
+	})
+
+	filterContainer := container.NewVBox(
+		creationDateRange,
+		firstAlbumRange,
+		numMembers,
+		locations,
+		container.NewHBox(applyButton, resetButton),
+	)
+
 	content := container.NewCenter(container.NewVBox(
 		titleContainer,
 		inputContainer,
+		filterContainer,
 	))
 	myWindow.SetContent(content)
 	myWindow.Resize(fyne.NewSize(800, 500))
