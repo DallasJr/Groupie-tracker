@@ -1,13 +1,15 @@
 package structs
 
-type Artists struct {
-	id           int
-	image        string
-	name         string
-	members      []string
-	creationDate int
-	firstAlbum   string
-	locations    Locations
-	concertDates Dates
-	relations    Relation
+var Artists []Artist
+
+type Artist struct {
+	ID           int      `json:"id"`
+	Image        string   `json:"image"`
+	Name         string   `json:"name"`
+	Members      []string `json:"members"`
+	CreationDate int      `json:"creationDate"`
+	FirstAlbum   string   `json:"firstAlbum"`
+	Locations    string   `json:"locations"`
+	ConcertDates string   `json:"concertDates"`
+	Relations    string   `json:"relations"`
 }

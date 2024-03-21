@@ -1,26 +1,13 @@
-package structs
+package core
 
 import (
 	"encoding/json"
 	"fmt"
+	"groupie-tracker/structs"
 	"net/http"
 	"strconv"
 	"strings"
 )
-
-type Artist struct {
-	ID           int      `json:"id"`
-	Image        string   `json:"image"`
-	Name         string   `json:"name"`
-	Members      []string `json:"members"`
-	CreationDate int      `json:"creationDate"`
-	FirstAlbum   string   `json:"firstAlbum"`
-	Locations    string   `json:"locations"`
-	ConcertDates string   `json:"concertDates"`
-	Relations    string   `json:"relations"`
-}
-
-var artists []Artist
 
 // refaire le load pour qu'il soit dinamique avec ce lien
 func Load() {
@@ -42,17 +29,22 @@ func Load() {
 	}
 
 	// Décoder les données JSON
-	err = json.NewDecoder(response.Body).Decode(&artists)
+	err = json.NewDecoder(response.Body).Decode(&structs.Artists)
 	if err != nil {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
+	fmt.Println("Loaded artists: ")
+	for _, artist := range structs.Artists {
+		fmt.Println("- " + artist.Name)
+	}
 }
 
 // Recherche d'artistes par nom
-func SearchArtistsByName(query string) []Artist {
-	var results []Artist
-	for _, artist := range artists {
+func SearchArtistsByName(query string) []structs.Artist {
+	Load()
+	var results []structs.Artist
+	for _, artist := range structs.Artists {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
 			results = append(results, artist)
 		}
@@ -61,9 +53,9 @@ func SearchArtistsByName(query string) []Artist {
 }
 
 // Recherche d'artistes par membre
-func SearchArtistsByMember(query string) []Artist {
-	var results []Artist
-	for _, artist := range artists {
+func SearchArtistsByMember(query string) []structs.Artist {
+	var results []structs.Artist
+	for _, artist := range structs.Artists {
 		for _, member := range artist.Members {
 			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
 				results = append(results, artist)
@@ -75,9 +67,9 @@ func SearchArtistsByMember(query string) []Artist {
 }
 
 // Recherche d'artistes par année de création
-func SearchArtistsByCreationYear(year int) []Artist {
-	var results []Artist
-	for _, artist := range artists {
+func SearchArtistsByCreationYear(year int) []structs.Artist {
+	var results []structs.Artist
+	for _, artist := range structs.Artists {
 		if artist.CreationDate == year {
 			results = append(results, artist)
 		}
@@ -86,8 +78,8 @@ func SearchArtistsByCreationYear(year int) []Artist {
 }
 
 // Recherche d'artistes générique
-func Search(query string) []Artist {
-	var results []Artist
+func Search(query string) []structs.Artist {
+	var results []structs.Artist
 
 	// Recherche par nom d'artiste
 	nameResults := SearchArtistsByName(query)
@@ -104,7 +96,7 @@ func Search(query string) []Artist {
 	}
 
 	// Recherche par d'autres champs comme les localisations, les dates de concert, etc.
-	for _, artist := range artists {
+	for _, artist := range structs.Artists {
 		if strings.Contains(strings.ToLower(artist.Locations), strings.ToLower(query)) ||
 			strings.Contains(strings.ToLower(artist.ConcertDates), strings.ToLower(query)) ||
 			strings.Contains(strings.ToLower(artist.Relations), strings.ToLower(query)) {
@@ -119,9 +111,9 @@ func Search(query string) []Artist {
 }
 
 // Fonction utilitaire pour supprimer les doublons dans la liste des artistes
-func removeDuplicates(artists []Artist) []Artist {
+func removeDuplicates(artists []structs.Artist) []structs.Artist {
 	encountered := map[int]bool{}
-	var result []Artist
+	var result []structs.Artist
 
 	for _, artist := range artists {
 		if !encountered[artist.ID] {
@@ -136,7 +128,7 @@ func removeDuplicates(artists []Artist) []Artist {
 func GetSuggestions(query string) []string {
 	var suggestions []string
 
-	for _, artist := range artists {
+	for _, artist := range structs.Artists {
 		// Vérifier si le nom de l'artiste contient la chaîne de caractères de la requête
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
 			suggestions = append(suggestions, artist.Name)

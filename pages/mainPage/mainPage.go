@@ -1,12 +1,13 @@
 package mainPage
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"groupie-tracker/structs"
+	"groupie-tracker/core"
 	"image/color"
 )
 
@@ -20,7 +21,11 @@ func LoadPage(myWindow fyne.Window) {
 	searchEntry.SetPlaceHolder("Search here")
 
 	searchButton := widget.NewButtonWithIcon("", theme.MailForwardIcon(), func() {
-		structs.Load()
+		searchInput := searchEntry.Text
+		fmt.Println("Found: ")
+		for _, art := range core.SearchArtistsByName(searchInput) {
+			fmt.Println("- " + art.Name)
+		}
 	})
 
 	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
@@ -30,6 +35,7 @@ func LoadPage(myWindow fyne.Window) {
 
 	inputContainer := container.NewWithoutLayout(searchEntry, searchButton)
 
+	//Filters:
 	creationDateRange := container.NewVBox(
 		widget.NewLabel("Creation Date Range"),
 		widget.NewSlider(0, 2024),

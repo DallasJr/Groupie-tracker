@@ -1,11 +1,5 @@
 package filtre
 
-import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-)
-
 type Filters struct {
 	CreationDateMin float64
 	CreationDateMax float64
@@ -15,11 +9,7 @@ type Filters struct {
 	Locations       []string
 }
 
-func NewFilters() *Filters {
-	return &Filters{}
-}
-
-func CreateFiltersUI(f *Filters) fyne.CanvasObject {
+/*func CreateFiltersUI() fyne.CanvasObject {
 	creationDateRange := container.NewVBox(
 		widget.NewLabel("Creation Date Range"),
 		widget.NewSlider(0, 2024),
@@ -39,13 +29,13 @@ func CreateFiltersUI(f *Filters) fyne.CanvasObject {
 
 	locations := container.NewVBox(
 		widget.NewLabel("Locations"),
-		widget.NewCheck("USA", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("FR", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
-		widget.NewCheck("UK", func(checked bool) { /* Update filter values */ }),
+		widget.NewCheck("USA", func(checked bool) {  }),
+		widget.NewCheck("UK", func(checked bool) {  }),
+		widget.NewCheck("FR", func(checked bool) {  }),
+		widget.NewCheck("UK", func(checked bool) {  }),
+		widget.NewCheck("UK", func(checked bool) {  }),
+		widget.NewCheck("UK", func(checked bool) {  }),
+		widget.NewCheck("UK", func(checked bool) {  }),
 	)
 
 	applyButton := widget.NewButton("Apply Filters", func() {
@@ -63,4 +53,4 @@ func CreateFiltersUI(f *Filters) fyne.CanvasObject {
 		locations,
 		container.NewHBox(applyButton, resetButton),
 	)
-}
+}*/
