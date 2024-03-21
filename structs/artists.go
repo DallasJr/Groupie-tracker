@@ -1,5 +1,12 @@
 package structs
 
+import (
+	"fmt"
+	"fyne.io/fyne/v2/canvas"
+	"image"
+	"net/http"
+)
+
 var Artists []Artist
 
 type Artist struct {
@@ -12,4 +19,21 @@ type Artist struct {
 	Locations    string   `json:"locations"`
 	ConcertDates string   `json:"concertDates"`
 	Relations    string   `json:"relations"`
+}
+
+func (artist *Artist) GetImage() *canvas.Image {
+	resp, err := http.Get(artist.Image)
+	if err != nil {
+		fmt.Println("Failed to load image:", err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		fmt.Println("Failed to decode image:", err)
+		return nil
+	}
+
+	return canvas.NewImageFromImage(img)
 }
