@@ -6,30 +6,32 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
+	"time"
 )
 
 func LoadPage(myWindow fyne.Window) {
 
 	titleLabel := canvas.NewText("Groupie Tracker", color.White)
 	titleLabel.TextSize = 50
-	titleContainer := container.NewCenter(titleLabel)
 
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
 
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
-	searchButton := widget.NewButtonWithIcon("", theme.MailForwardIcon(), func() {
+
+	const searchDelay = 500
+	var searchTimer *time.Timer
+
+	performSearch := func() {
 		resultsContainer.RemoveAll()
 		searchInput := searchEntry.Text
-		searchResults = core.SearchArtistsByName(searchInput)
+		searchResults = core.Search(searchInput)
 		for _, art := range searchResults {
-
 			picture := art.GetImage()
 			picture.FillMode = canvas.ImageFillContain
 			picture.SetMinSize(fyne.NewSize(100, 100))
@@ -37,21 +39,18 @@ func LoadPage(myWindow fyne.Window) {
 				container.New(layout.NewCenterLayout(), picture),
 				container.NewWithoutLayout(widget.NewLabel(art.Name)),
 			)
-			/*resultCard.SetOnTapped(func() {
-				// Handle the tap event here
-				label.SetText("Button Clicked!")
-			})*/
 			resultsContainer.Add(resultCard)
 			fmt.Println("Found: " + art.Name)
 		}
-	})
-
-	searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
-	searchEntry.Move(fyne.NewPos(-40, 0))
-	searchButton.Resize(fyne.NewSize(searchButton.MinSize().Width, searchButton.MinSize().Height))
-	searchButton.Move(fyne.NewPos(380, 0))
-
-	inputContainer := container.NewWithoutLayout(searchEntry, searchButton)
+	}
+	searchEntry.OnChanged = func(text string) {
+		if searchTimer != nil {
+			searchTimer.Stop()
+		}
+		searchTimer = time.AfterFunc(searchDelay*time.Millisecond, func() {
+			performSearch()
+		})
+	}
 
 	//Filters:
 	creationDateRange := container.NewVBox(
@@ -95,18 +94,18 @@ func LoadPage(myWindow fyne.Window) {
 		locations,
 		container.NewHBox(applyButton, resetButton),
 	)
-	//resultsContainer.Resize(fyne.NewSize(415, resultsContainer.MinSize().Height))
 
-	//searchEntry.Resize(fyne.NewSize(415, searchEntry.MinSize().Height))
-
+	topContainer := container.NewVBox(
+		titleLabel,
+		searchEntry,
+	)
 	bottomContainer := container.NewHBox(
 		filterContainer,
-		resultsContainer,
+		container.NewVScroll(resultsContainer),
 	)
 
 	content := container.NewCenter(container.NewVBox(
-		titleContainer,
-		inputContainer,
+		topContainer,
 		bottomContainer,
 	))
 
