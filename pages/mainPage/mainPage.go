@@ -5,17 +5,17 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
-	"time"
+	"strings"
+	"sync"
 )
 
 func LoadPage(myWindow fyne.Window) {
 
-	titleLabel := canvas.NewText("Groupie Tracker", color.White)
+	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
 	titleLabel.TextSize = 50
 
 	searchEntry := widget.NewEntry()
@@ -23,11 +23,14 @@ func LoadPage(myWindow fyne.Window) {
 
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
+	cancelPreviousSearch := make(chan struct{}, 1)
 
-	const searchDelay = 500
-	var searchTimer *time.Timer
+	var searchMutex sync.Mutex
 
-	performSearch := func() {
+	performSearch := func(cancel <-chan struct{}) {
+		searchMutex.Lock()
+		defer searchMutex.Unlock()
+
 		resultsContainer.RemoveAll()
 		searchInput := searchEntry.Text
 		searchResults = core.Search(searchInput)
@@ -35,21 +38,25 @@ func LoadPage(myWindow fyne.Window) {
 			picture := art.GetImage()
 			picture.FillMode = canvas.ImageFillContain
 			picture.SetMinSize(fyne.NewSize(100, 100))
+
+			fixedName := art.Name
+			if len(art.Name) < 60 {
+				fixedName += strings.Repeat(" ", 60-len(art.Name))
+			}
 			resultCard := container.NewHBox(
-				container.New(layout.NewCenterLayout(), picture),
-				container.NewWithoutLayout(widget.NewLabel(art.Name)),
+				picture,
+				widget.NewLabel(fixedName),
 			)
 			resultsContainer.Add(resultCard)
 			fmt.Println("Found: " + art.Name)
 		}
 	}
 	searchEntry.OnChanged = func(text string) {
-		if searchTimer != nil {
-			searchTimer.Stop()
+		select {
+		case cancelPreviousSearch <- struct{}{}:
+		default:
 		}
-		searchTimer = time.AfterFunc(searchDelay*time.Millisecond, func() {
-			performSearch()
-		})
+		go performSearch(cancelPreviousSearch)
 	}
 
 	//Filters:
@@ -96,14 +103,13 @@ func LoadPage(myWindow fyne.Window) {
 	)
 
 	topContainer := container.NewVBox(
-		titleLabel,
+		container.NewCenter(titleLabel),
 		searchEntry,
 	)
 	bottomContainer := container.NewHBox(
 		filterContainer,
 		container.NewVScroll(resultsContainer),
 	)
-
 	content := container.NewCenter(container.NewVBox(
 		topContainer,
 		bottomContainer,
