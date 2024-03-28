@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"fyne.io/fyne/v2/app"
 	"groupie-tracker/pages/mainPage"
+
+	"fyne.io/fyne/v2/app"
 )
 
 func main() {

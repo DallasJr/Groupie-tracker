@@ -1,11 +1,11 @@
 package structs
 
 type Relation struct {
-	id             int
-	datesLocations []DatesLocations
+	id              int              `json:"id"`
+	Dates_Locations []DatesLocations `json:"datesLocations"`
 }
 
 type DatesLocations struct {
-	location string
-	dates    []string
+	location    string   `json:"location"`
+	Table_Dates []string `json:"dates"`
 }

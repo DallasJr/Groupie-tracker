@@ -1,7 +1,7 @@
 package structs
 
 type Locations struct {
-	id        int
-	locations []string
-	dates     Dates
+	ID        int      `json:"id"`
+	Locations []string `json:"locations"`
+	Dates     Dates    `json:"dates"`
 }
