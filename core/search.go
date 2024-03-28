@@ -71,6 +71,17 @@ func Search(query string) []structs.Artist {
 				results = append(results, artist)
 			}
 		}
+
+		for _, relation := range artist.Relations.Relationlocation {
+			if strings.Contains(strings.ToLower(relation), strings.ToLower(query)) {
+				results = append(results, artist)
+			}
+		}
+		for _, relation := range artist.Relations.Table_Dates {
+			if strings.Contains(strings.ToLower(relation), strings.ToLower(query)) {
+				results = append(results, artist)
+			}
+		}
 	}
 
 	// Supprimer les doublons potentiels

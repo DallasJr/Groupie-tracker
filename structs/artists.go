@@ -19,7 +19,7 @@ type Artist struct {
 	FirstAlbum   string   `json:"firstAlbum"`
 	Locations    []string `json:"-"`
 	ConcertDates []string `json:"-"`
-	Relations    string   `json:"-"`
+	Relations    Relation `json:"-"`
 }
 
 func (artist *Artist) GetImage() *canvas.Image {
