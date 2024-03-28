@@ -5,11 +5,12 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
-	"strings"
 	"time"
 )
 
@@ -32,19 +33,30 @@ func LoadPage(myWindow fyne.Window) {
 			picture := art.GetImage()
 			picture.FillMode = canvas.ImageFillContain
 			picture.SetMinSize(fyne.NewSize(100, 100))
-
 			fixedName := art.Name
-			if len(art.Name) < 60 {
-				fixedName += strings.Repeat(" ", 60-len(art.Name))
-			}
-			resultCard := container.NewHBox(
+			artistLabel := widget.NewLabel(fixedName)
+			infoButton := widget.NewButton("", func() {
+				// Action when the button is clicked
+			})
+			infoButton.Importance = widget.LowImportance
+			infoButton.SetIcon(theme.NavigateNextIcon())
+			namepicture := container.NewGridWithColumns(2,
 				picture,
-				widget.NewLabel(fixedName),
+				artistLabel,
 			)
+			resultCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
+				namepicture,
+				infoButton)
+			for resultCard.MinSize().Width <= 404 {
+				artistLabel.Text += " "
+				artistLabel.Refresh()
+			}
+			fmt.Println(resultCard.MinSize().Width)
 			resultsContainer.Add(resultCard)
-			//fmt.Println("Found: " + art.Name)
 		}
+
 	}
+	performSearch()
 	var latestSearch = time.Time{}
 
 	searchEntry.OnChanged = func(text string) {
