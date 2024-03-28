@@ -34,18 +34,11 @@ func LoadArtists() {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
-
-	fmt.Println("Loaded artists: ")
-	for _, artist := range structs.Artists {
-		for _, truc := range artist.Locations {
-			fmt.Println("- " + truc)
-		}
-	}
 }
 
 func loadLocations() {
-	for _, artist := range structs.Artists {
-		url := "https://groupietrackers.herokuapp.com/api/locations/" + fmt.Sprint(artist.ID)
+	for i := range structs.Artists {
+		url := "https://groupietrackers.herokuapp.com/api/locations/" + fmt.Sprint(structs.Artists[i].ID)
 		response, err := http.Get(url)
 		if err != nil {
 			fmt.Println("Erreur lors de la requête :", err)
@@ -58,7 +51,6 @@ func loadLocations() {
 			fmt.Println("La requête a retourné un code de statut non-200 :", response.StatusCode)
 			return
 		}
-
 		// Décoder les données JSON
 		var locations structs.Locations
 		err = json.NewDecoder(response.Body).Decode(&locations)
@@ -66,6 +58,8 @@ func loadLocations() {
 			fmt.Println("Erreur lors du décodage des données JSON :", err)
 			return
 		}
-		artist.Locations = locations.Locations
+
+		// Assigner les locations à l'artiste correspondant
+		structs.Artists[i].Locations = locations.Locations
 	}
 }
