@@ -2,11 +2,13 @@ package core
 
 import (
 	"groupie-tracker/structs"
+	"strconv"
 	"strings"
 )
 
 // Recherche d'artistes par nom
 func SearchArtistsByName(query string) []structs.Artist {
+	Load()
 	var results []structs.Artist
 	for _, artist := range structs.Artists {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
@@ -41,53 +43,9 @@ func SearchArtistsByCreationYear(year int) []structs.Artist {
 	return results
 }
 
-// Recherche d'artistes par localisation
-func SearchArtistsByLocation(location string) []structs.Artist {
-	var results []structs.Artist
-
-	for _, artist := range structs.Artists {
-		if strings.Contains(strings.ToLower(strings.Join(artist.Locations.Locations, " ")), strings.ToLower(location)) {
-			results = append(results, artist)
-		}
-	}
-
-	return results
-}
-
-// Recherche d'artistes par date
-func SearchArtistsByDate(date string) []structs.Artist {
-	var results []structs.Artist
-
-	for _, artist := range structs.Artists {
-		if strings.Contains(strings.ToLower(strings.Join(artist.Locations.Dates.Dates, " ")), strings.ToLower(date)) {
-			results = append(results, artist)
-		}
-	}
-
-	return results
-}
-
-// Recherche d'artistes par relation
-func SearchArtistsByRelation(relation string) []structs.Artist {
-	var results []structs.Artist
-
-	for _, artist := range structs.Artists {
-		for _, datesLocation := range artist.Relations.Dates_Locations {
-			if strings.Contains(strings.ToLower(strings.Join(datesLocation.Table_Dates, " ")), strings.ToLower(relation)) {
-				results = append(results, artist)
-				break
-			}
-		}
-	}
-
-	return results
-}
-
 // Recherche d'artistes générique
 func Search(query string) []structs.Artist {
-	Load()
 	var results []structs.Artist
-
 	// Recherche par nom d'artiste
 	nameResults := SearchArtistsByName(query)
 	results = append(results, nameResults...)
@@ -96,17 +54,24 @@ func Search(query string) []structs.Artist {
 	memberResults := SearchArtistsByMember(query)
 	results = append(results, memberResults...)
 
-	// Recherche par localisation
-	locationResults := SearchArtistsByLocation(query)
-	results = append(results, locationResults...)
+	// Recherche par année de création (si la requête est un nombre)
+	if year, err := strconv.Atoi(query); err == nil {
+		yearResults := SearchArtistsByCreationYear(year)
+		results = append(results, yearResults...)
+	}
 
-	// Recherche par date
-	dateResults := SearchArtistsByDate(query)
-	results = append(results, dateResults...)
-
-	// Recherche par relation
-	relationResults := SearchArtistsByRelation(query)
-	results = append(results, relationResults...)
+	for _, artist := range structs.Artists {
+		for loc := range artist.Locations {
+			if strings.Contains(strings.ToLower(artist.Locations[loc]), strings.ToLower(query)) {
+				results = append(results, artist)
+			}
+		}
+		for concertdate := range artist.ConcertDates {
+			if strings.Contains(strings.ToLower(artist.ConcertDates[concertdate]), strings.ToLower(query)) {
+				results = append(results, artist)
+			}
+		}
+	}
 
 	// Supprimer les doublons potentiels
 	results = removeDuplicates(results)
@@ -141,7 +106,3 @@ func GetSuggestions(query string) []string {
 
 	return suggestions
 }
-
-//func GetContain(query string) string {
-//	container.New()
-//}
