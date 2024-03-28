@@ -34,10 +34,10 @@ func Load() {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
-	fmt.Println("Loaded artists: ")
+	/*fmt.Println("Loaded artists: ")
 	for _, artist := range structs.Artists {
 		fmt.Println("- " + artist.Name)
-	}
+	}*/
 }
 
 // Recherche d'artistes par nom

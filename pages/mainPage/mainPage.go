@@ -10,7 +10,7 @@ import (
 	"groupie-tracker/structs"
 	"image/color"
 	"strings"
-	"sync"
+	"time"
 )
 
 func LoadPage(myWindow fyne.Window) {
@@ -23,14 +23,8 @@ func LoadPage(myWindow fyne.Window) {
 
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
-	cancelPreviousSearch := make(chan struct{}, 1)
 
-	var searchMutex sync.Mutex
-
-	performSearch := func(cancel <-chan struct{}) {
-		searchMutex.Lock()
-		defer searchMutex.Unlock()
-
+	performSearch := func() {
 		resultsContainer.RemoveAll()
 		searchInput := searchEntry.Text
 		searchResults = core.Search(searchInput)
@@ -48,15 +42,23 @@ func LoadPage(myWindow fyne.Window) {
 				widget.NewLabel(fixedName),
 			)
 			resultsContainer.Add(resultCard)
-			fmt.Println("Found: " + art.Name)
+			//fmt.Println("Found: " + art.Name)
 		}
 	}
+	var latestSearch = time.Time{}
+
 	searchEntry.OnChanged = func(text string) {
-		select {
-		case cancelPreviousSearch <- struct{}{}:
-		default:
-		}
-		go performSearch(cancelPreviousSearch)
+		latestSearch = time.Now()
+		go func(thisTime time.Time) {
+			time.Sleep(1200 * time.Millisecond)
+			if latestSearch != thisTime {
+				fmt.Println("ignored", text)
+				return
+			} else {
+				fmt.Println("searched", text)
+				performSearch()
+			}
+		}(latestSearch)
 	}
 
 	//Filters:
