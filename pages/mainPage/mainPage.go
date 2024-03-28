@@ -51,7 +51,6 @@ func LoadPage(myWindow fyne.Window) {
 				artistLabel.Text += " "
 				artistLabel.Refresh()
 			}
-			fmt.Println(resultCard.MinSize().Width)
 			resultsContainer.Add(resultCard)
 		}
 
