@@ -69,7 +69,7 @@ func loadLocations() {
 
 func loadDate() {
 	for i := range structs.Artists {
-		url := "https://groupietrackers.herokuapp.com/api/date/" + fmt.Sprint(structs.Artists[i].ID)
+		url := "https://groupietrackers.herokuapp.com/api/dates/" + fmt.Sprint(structs.Artists[i].ID)
 		response, err := http.Get(url)
 		if err != nil {
 			fmt.Println("Erreur lors de la requête :", err)
