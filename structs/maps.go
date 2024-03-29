@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
-var width = 300
-var height = 300
+const width = 300
+const height = 300
+const zoom = 4
 
 type Map struct {
 	lat     float32
@@ -27,7 +28,7 @@ type LocResponse struct {
 	} `json:"results"`
 }
 
-func NewMap(center string, zoom int) *Map {
+func NewMap(center string) *Map {
 	parts := strings.Split(center, "-")
 	city := strings.Replace(parts[0], "_", "%20", -1)
 	country := strings.Replace(parts[1], "_", "%20", -1)

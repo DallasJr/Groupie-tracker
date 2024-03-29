@@ -132,5 +132,4 @@ func LoadMainPage(myWindow fyne.Window) {
 	))
 
 	myWindow.SetContent(content)
-	myWindow.Resize(fyne.NewSize(800, 500))
 }

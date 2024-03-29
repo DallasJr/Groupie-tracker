@@ -53,7 +53,7 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 		for location, dates := range artist.Relations.DatesLocations {
 			fmt.Println(location)
 			concertCard := container.NewVBox()
-			m := structs.NewMap(location, 4)
+			m := structs.NewMap(location)
 			m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")
 			img := m.GetImg()
 			fyneImg := canvas.NewImageFromImage(img)
