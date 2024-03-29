@@ -76,6 +76,20 @@ func LoadPage(myWindow fyne.Window) {
 	sliderCreationDateStart := widget.NewSlider(0, 2024)
 	sliderCreationDateEnd := widget.NewSlider(0, 2024)
 
+	searchEntry.OnChanged = func(text string) {
+		latestSearch = time.Now()
+		go func(thisTime time.Time) {
+			time.Sleep(1200 * time.Millisecond)
+			if latestSearch != thisTime {
+				fmt.Println("ignored", text)
+				return
+			} else {
+				fmt.Println("searched", text)
+				performSearch()
+			}
+		}(latestSearch)
+	}
+
 	creationDateRange := container.NewVBox(
 		widget.NewLabel("Creation Date Range"),
 		sliderCreationDateStart,
