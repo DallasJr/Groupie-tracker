@@ -2,16 +2,17 @@ package pages
 
 import (
 	"fmt"
+	"groupie-tracker/core"
+	"groupie-tracker/structs"
+	"image/color"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"groupie-tracker/core"
-	"groupie-tracker/structs"
-	"image/color"
-	"time"
 )
 
 func LoadMainPage(myWindow fyne.Window) {
@@ -76,29 +77,45 @@ func LoadMainPage(myWindow fyne.Window) {
 	}
 
 	//Filters:
+	// Déclaration et initialisation des sliders pour Creation Date Range
+	sliderCreationDateStart := widget.NewSlider(0, 2024)
+	sliderCreationDateEnd := widget.NewSlider(0, 2024)
+
 	creationDateRange := container.NewVBox(
 		widget.NewLabel("Creation Date Range"),
-		widget.NewSlider(0, 2024),
-		widget.NewSlider(0, 2024),
+		sliderCreationDateStart,
+		sliderCreationDateEnd,
 	)
+
+	// Déclaration et initialisation des sliders pour First Album Date Range
+	sliderFirstAlbumStart := widget.NewSlider(0, 2024)
+	sliderFirstAlbumEnd := widget.NewSlider(0, 2024)
 
 	firstAlbumRange := container.NewVBox(
 		widget.NewLabel("First Album Date Range"),
-		widget.NewSlider(0, 2024),
-		widget.NewSlider(0, 2024),
+		sliderFirstAlbumStart,
+		sliderFirstAlbumEnd,
 	)
+
+	// Déclaration et initialisation de l'entry pour Number of Members
+	entryNumMembers := widget.NewEntry()
 
 	numMembers := container.NewVBox(
 		widget.NewLabel("Number of Members"),
-		widget.NewEntry(),
+		entryNumMembers,
 	)
+
+	// Déclaration et initialisation des checkboxes pour Locations
+	checkUSA := widget.NewCheck("USA", func(checked bool) {})
+	checkUK := widget.NewCheck("UK", func(checked bool) {})
+	checkFR := widget.NewCheck("FR", func(checked bool) {})
 
 	locations := container.NewVBox(
 		widget.NewLabel("Locations"),
 		container.NewHBox(
-			widget.NewCheck("USA", func(checked bool) {}),
-			widget.NewCheck("UK", func(checked bool) {}),
-			widget.NewCheck("FR", func(checked bool) {}),
+			checkUSA,
+			checkUK,
+			checkFR,
 		),
 	)
 
@@ -107,7 +124,15 @@ func LoadMainPage(myWindow fyne.Window) {
 	})
 
 	resetButton := widget.NewButton("Reset Filters", func() {
-
+		// Ici, vous pouvez maintenant accéder directement aux variables
+		sliderCreationDateStart.SetValue(0)
+		sliderCreationDateEnd.SetValue(0)
+		sliderFirstAlbumStart.SetValue(0)
+		sliderFirstAlbumEnd.SetValue(0)
+		entryNumMembers.SetText("")
+		checkUSA.SetChecked(false)
+		checkUK.SetChecked(false)
+		checkFR.SetChecked(false)
 	})
 
 	filterContainer := container.NewVBox(
