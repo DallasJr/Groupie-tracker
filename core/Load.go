@@ -5,18 +5,49 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2/canvas"
 	"groupie-tracker/structs"
+	"io"
 	"net/http"
+	"os"
 )
 
 func Load() {
+	LoadFavorites()
 	LoadArtists()
 	loadLocations()
 	loadDate()
 	loadRelations()
 }
 
+const FavFile = "favs.json"
+
+func LoadFavorites() {
+	fmt.Println("Loading Favorites")
+	if _, err := os.Stat(FavFile); err == nil {
+		file, err := os.Open(FavFile)
+		if err != nil {
+			return
+		}
+		defer file.Close()
+		jsonBytes, err := io.ReadAll(file)
+		if err != nil {
+			return
+		}
+		err = json.Unmarshal(jsonBytes, &Favorites)
+		if err != nil {
+			return
+		}
+		fmt.Println("Loaded favorites file")
+		return
+	} else if os.IsNotExist(err) {
+		fmt.Println("Data file doesn't exist yet")
+	} else {
+		fmt.Println("Error occurred while checking file existence:", err)
+	}
+}
+
 func LoadArtists() {
 	fmt.Println("Loading Artists")
+	structs.ImageArtist = make(map[int]*canvas.Image)
 	URL := "https://groupietrackers.herokuapp.com/api/artists"
 
 	// Faire une requête GET à l'API
@@ -38,6 +69,10 @@ func LoadArtists() {
 	if err != nil {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
+	}
+	fmt.Println("Loading artists images")
+	for _, artist := range structs.Artists {
+		go structs.StoreArtistImage(artist)
 	}
 }
 
@@ -67,7 +102,7 @@ func loadLocations() {
 			return
 		}
 		for _, loc := range locations.Locations {
-			if !contains(allLocations, loc) {
+			if !ContainsString(allLocations, loc) {
 				allLocations = append(allLocations, loc)
 			}
 		}
@@ -77,7 +112,7 @@ func loadLocations() {
 	}
 	fmt.Println("Loading Map images")
 	for _, loc := range allLocations {
-		go structs.Generate(loc)
+		go structs.GenerateMapImage(loc)
 	}
 }
 
@@ -135,13 +170,4 @@ func loadRelations() {
 
 		structs.Artists[i].Relations = concerts
 	}
-}
-
-func contains(arr []string, str string) bool {
-	for _, v := range arr {
-		if v == str {
-			return true
-		}
-	}
-	return false
 }

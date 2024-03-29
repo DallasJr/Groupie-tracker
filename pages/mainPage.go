@@ -33,14 +33,9 @@ func LoadMainPage(myWindow fyne.Window) {
 		for _, art := range searchResults {
 			art := art
 			picture := art.GetImage()
-			picture.FillMode = canvas.ImageFillContain
-			picture.SetMinSize(fyne.NewSize(100, 100))
-			fixedName := art.Name
-			artistLabel := widget.NewLabel(fixedName)
+			artistLabel := widget.NewLabel(art.Name)
 			infoButton := widget.NewButton("", func() {
-				fmt.Println("Loading " + art.Name)
 				LoadArtistPage(art, myWindow)
-				return
 			})
 			infoButton.Importance = widget.LowImportance
 			infoButton.SetIcon(theme.NavigateNextIcon())
@@ -156,5 +151,23 @@ func LoadMainPage(myWindow fyne.Window) {
 		bottomContainer,
 	))
 
-	myWindow.SetContent(content)
+	favoriteContainer := container.NewVBox()
+	favoritesLabel := canvas.NewText("Favorites:", color.White)
+	favoritesLabel.TextSize = 30
+	favoriteContainer.Add(container.NewCenter(favoritesLabel))
+	if len(core.Favorites) > 0 {
+		favorites := container.NewGridWithColumns(3)
+		for _, favorite := range core.Favorites {
+			favoriteCard := container.NewVBox()
+			artist := structs.GetArtist(favorite)
+			image := artist.GetImage()
+			favoriteCard.Add(image)
+			artistLabel := widget.NewLabel(structs.GetArtist(favorite).Name)
+			favoriteCard.Add(container.NewCenter(artistLabel))
+			favorites.Add(favoriteCard)
+		}
+		favoriteContainer.Add(favorites)
+	}
+	final := container.NewVBox(content, favoriteContainer)
+	myWindow.SetContent(container.NewVScroll(final))
 }

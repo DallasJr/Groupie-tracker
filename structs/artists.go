@@ -2,6 +2,7 @@ package structs
 
 import (
 	"fmt"
+	"fyne.io/fyne/v2"
 	"image"
 	"net/http"
 	"strings"
@@ -23,21 +24,28 @@ type Artist struct {
 	Relations    Relations `json:"-"`
 }
 
-func (artist *Artist) GetImage() *canvas.Image {
+var ImageArtist map[int]*canvas.Image
+
+func StoreArtistImage(artist Artist) {
 	resp, err := http.Get(artist.Image)
 	if err != nil {
 		fmt.Println("Failed to load image:", err)
-		return nil
+		return
 	}
 	defer resp.Body.Close()
-
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
 		fmt.Println("Failed to decode image:", err)
-		return nil
+		return
 	}
+	ImageArtist[artist.ID] = canvas.NewImageFromImage(img)
+}
 
-	return canvas.NewImageFromImage(img)
+func (artist *Artist) GetImage() *canvas.Image {
+	formatted := canvas.NewImageFromImage(ImageArtist[artist.ID].Image)
+	formatted.FillMode = canvas.ImageFillContain
+	formatted.SetMinSize(fyne.NewSize(100, 100))
+	return formatted
 }
 
 func (artist *Artist) GetFirstAlbum() string {
@@ -46,4 +54,13 @@ func (artist *Artist) GetFirstAlbum() string {
 
 func GetFormattedDate(date string) string {
 	return strings.ReplaceAll(date, "-", "/")
+}
+
+func GetArtist(id int) Artist {
+	for _, artist := range Artists {
+		if artist.ID == id {
+			return artist
+		}
+	}
+	return Artist{}
 }

@@ -15,6 +15,7 @@ import (
 const width = 300
 const height = 300
 const zoom = 4
+const apiKey = "0d79a284d16d4a62bb19944deed7af20"
 
 var ImageMap map[string]*canvas.Image
 
@@ -32,7 +33,7 @@ type LocResponse struct {
 	} `json:"results"`
 }
 
-func Generate(location string) {
+func GenerateMapImage(location string) {
 	m := NewMap(location)
 	m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")
 	img := m.GetImg()
@@ -46,7 +47,7 @@ func NewMap(center string) *Map {
 	parts := strings.Split(center, "-")
 	city := strings.Replace(parts[0], "_", "%20", -1)
 	country := strings.Replace(parts[1], "_", "%20", -1)
-	url := "https://api.geoapify.com/v1/geocode/search?city=" + city + "&country=" + country + "&format=json&apiKey=d1ee7339aae647488e8b39534347dd95"
+	url := "https://api.geoapify.com/v1/geocode/search?city=" + city + "&country=" + country + "&format=json&apiKey=" + apiKey
 	res, err := http.Get(url)
 	if err != nil {
 		return nil
@@ -106,7 +107,7 @@ func (m *Map) GetURL() string {
 		}
 	}
 	url += "&scaleFactor=2"
-	url += "&apiKey=d1ee7339aae647488e8b39534347dd95"
+	url += "&apiKey=" + apiKey
 	return url
 }
 
