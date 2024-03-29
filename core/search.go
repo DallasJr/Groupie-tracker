@@ -44,7 +44,7 @@ func SearchArtistsByCreationYear(year int) []structs.Artist {
 
 // Recherche d'artistes générique
 func Search(query string) []structs.Artist {
-	Load()
+	//Load()
 	var results []structs.Artist
 	// Recherche par nom d'artiste
 	nameResults := SearchArtistsByName(query)

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"groupie-tracker/pages/mainPage"
-
 	"fyne.io/fyne/v2/app"
+	"groupie-tracker/core"
+	"groupie-tracker/pages"
 )
 
 func main() {
@@ -12,9 +12,9 @@ func main() {
 	fmt.Println("Launching app . . .")
 
 	//load les Artists depuis l'API
-	//structs.Load()
+	core.Load()
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Groupie Tracker")
-	mainPage.LoadPage(myWindow)
+	pages.LoadMainPage(myWindow)
 	myWindow.ShowAndRun()
 }

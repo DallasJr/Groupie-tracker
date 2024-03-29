@@ -1,4 +1,4 @@
-package artistPage
+package pages
 
 import (
 	"fmt"
@@ -12,9 +12,10 @@ import (
 	"strconv"
 )
 
-func LoadPage(artist structs.Artist, myWindow fyne.Window) {
+func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 	homeButton := widget.NewButton("Home", func() {
-
+		LoadMainPage(myWindow)
+		return
 	})
 	buttonContainer := container.NewVBox(homeButton)
 

@@ -1,4 +1,4 @@
-package mainPage
+package pages
 
 import (
 	"fmt"
@@ -9,13 +9,12 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"groupie-tracker/core"
-	"groupie-tracker/pages/artistPage"
 	"groupie-tracker/structs"
 	"image/color"
 	"time"
 )
 
-func LoadPage(myWindow fyne.Window) {
+func LoadMainPage(myWindow fyne.Window) {
 
 	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
 	titleLabel.TextSize = 50
@@ -39,7 +38,8 @@ func LoadPage(myWindow fyne.Window) {
 			artistLabel := widget.NewLabel(fixedName)
 			infoButton := widget.NewButton("", func() {
 				fmt.Println("Loading " + art.Name)
-				artistPage.LoadPage(art, myWindow)
+				LoadArtistPage(art, myWindow)
+				return
 			})
 			infoButton.Importance = widget.LowImportance
 			infoButton.SetIcon(theme.NavigateNextIcon())
