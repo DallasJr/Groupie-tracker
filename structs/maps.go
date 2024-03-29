@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-var width = 800
-var height = 600
+var width = 300
+var height = 300
 
 type Map struct {
 	lat     float32

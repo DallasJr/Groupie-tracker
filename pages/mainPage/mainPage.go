@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"groupie-tracker/core"
+	"groupie-tracker/pages/artistPage"
 	"groupie-tracker/structs"
 	"image/color"
 	"time"
@@ -30,13 +31,15 @@ func LoadPage(myWindow fyne.Window) {
 		searchInput := searchEntry.Text
 		searchResults = core.Search(searchInput)
 		for _, art := range searchResults {
+			art := art
 			picture := art.GetImage()
 			picture.FillMode = canvas.ImageFillContain
 			picture.SetMinSize(fyne.NewSize(100, 100))
 			fixedName := art.Name
 			artistLabel := widget.NewLabel(fixedName)
 			infoButton := widget.NewButton("", func() {
-				// Action when the button is clicked
+				fmt.Println("Loading " + art.Name)
+				artistPage.LoadPage(art, myWindow)
 			})
 			infoButton.Importance = widget.LowImportance
 			infoButton.SetIcon(theme.NavigateNextIcon())

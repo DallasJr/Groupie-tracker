@@ -72,14 +72,14 @@ func Search(query string) []structs.Artist {
 			}
 		}
 
-		for _, relation := range artist.Relations.Relationlocation {
-			if strings.Contains(strings.ToLower(relation), strings.ToLower(query)) {
+		for location, dates := range artist.Relations.DatesLocations {
+			if strings.Contains(strings.ToLower(location), strings.ToLower(query)) {
 				results = append(results, artist)
 			}
-		}
-		for _, relation := range artist.Relations.Table_Dates {
-			if strings.Contains(strings.ToLower(relation), strings.ToLower(query)) {
-				results = append(results, artist)
+			for _, date := range dates {
+				if strings.Contains(strings.ToLower(date), strings.ToLower(query)) {
+					results = append(results, artist)
+				}
 			}
 		}
 	}

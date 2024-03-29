@@ -117,7 +117,6 @@ func loadRelations() {
 			return
 		}
 
-		structs.Artists[i].Relations.Relationlocation = relation.Relationlocation
-		structs.Artists[i].Relations.Table_Dates = relation.Table_Dates
+		structs.Artists[i].Relations.DatesLocations = relation.DatesLocations
 	}
 }

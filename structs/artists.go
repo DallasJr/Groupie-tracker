@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"net/http"
+	"strings"
 
 	"fyne.io/fyne/v2/canvas"
 )
@@ -37,4 +38,8 @@ func (artist *Artist) GetImage() *canvas.Image {
 	}
 
 	return canvas.NewImageFromImage(img)
+}
+
+func (artist *Artist) GetFirstAlbum() string {
+	return strings.ReplaceAll(artist.FirstAlbum, "-", "/")
 }
