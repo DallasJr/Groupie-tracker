@@ -45,9 +45,9 @@ func LoadPage(artist structs.Artist, myWindow fyne.Window) {
 	concertsLabel := canvas.NewText("Concerts", color.White)
 	concertsLabel.TextSize = 50
 	concertsContainer.Add(container.NewCenter(concertsLabel))
-	if len(artist.Locations) > 0 {
+	if len(artist.Concerts.DatesLocations) > 0 {
 		concerts := container.NewGridWithColumns(3)
-		for location, dates := range artist.Relations.DatesLocations {
+		for location, dates := range artist.Concerts.DatesLocations {
 			concertCard := container.NewVBox()
 			m := structs.NewMap(location, 4)
 			m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")

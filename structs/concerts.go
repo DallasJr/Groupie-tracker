@@ -2,9 +2,8 @@ package structs
 
 import "strings"
 
-type Locations struct {
-	ID        int      `json:"id"`
-	Locations []string `json:"locations"`
+type Concerts struct {
+	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
 func GetFormatted(s string) string {
