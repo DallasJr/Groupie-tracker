@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"fyne.io/fyne/v2/canvas"
 	"groupie-tracker/structs"
 	"net/http"
 )
@@ -15,6 +16,7 @@ func Load() {
 }
 
 func LoadArtists() {
+	fmt.Println("Loading Artists")
 	URL := "https://groupietrackers.herokuapp.com/api/artists"
 
 	// Faire une requête GET à l'API
@@ -40,6 +42,9 @@ func LoadArtists() {
 }
 
 func loadLocations() {
+	fmt.Println("Loading Locations")
+	structs.ImageMap = make(map[string]*canvas.Image)
+	var allLocations []string
 	for i := range structs.Artists {
 		url := "https://groupietrackers.herokuapp.com/api/locations/" + fmt.Sprint(structs.Artists[i].ID)
 		response, err := http.Get(url)
@@ -61,13 +66,23 @@ func loadLocations() {
 			fmt.Println("Erreur lors du décodage des données JSON :", err)
 			return
 		}
+		for _, loc := range locations.Locations {
+			if !contains(allLocations, loc) {
+				allLocations = append(allLocations, loc)
+			}
+		}
 
 		// Assigner les locations à l'artiste correspondant
 		structs.Artists[i].Locations = locations.Locations
 	}
+	fmt.Println("Loading Map images")
+	for _, loc := range allLocations {
+		go structs.Generate(loc)
+	}
 }
 
 func loadDate() {
+	fmt.Println("Loading Dates")
 	for i := range structs.Artists {
 		url := "https://groupietrackers.herokuapp.com/api/dates/" + fmt.Sprint(structs.Artists[i].ID)
 		response, err := http.Get(url)
@@ -95,6 +110,7 @@ func loadDate() {
 }
 
 func loadRelations() {
+	fmt.Println("Loading Relations")
 	for i := range structs.Artists {
 		url := "https://groupietrackers.herokuapp.com/api/relation/" + fmt.Sprint(structs.Artists[i].ID)
 		response, err := http.Get(url)
@@ -119,4 +135,13 @@ func loadRelations() {
 
 		structs.Artists[i].Relations = concerts
 	}
+}
+
+func contains(arr []string, str string) bool {
+	for _, v := range arr {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

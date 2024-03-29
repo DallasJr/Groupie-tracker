@@ -1,7 +1,6 @@
 package pages
 
 import (
-	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -51,15 +50,8 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 	if len(artist.Locations) > 0 {
 		concerts := container.NewGridWithColumns(3)
 		for location, dates := range artist.Relations.DatesLocations {
-			fmt.Println(location)
 			concertCard := container.NewVBox()
-			m := structs.NewMap(location)
-			m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")
-			img := m.GetImg()
-			fyneImg := canvas.NewImageFromImage(img)
-			fyneImg.FillMode = canvas.ImageFillContain
-			fyneImg.SetMinSize(fyne.NewSize(300, 300))
-			concertCard.Add(fyneImg)
+			concertCard.Add(structs.ImageMap[location])
 			locationText := canvas.NewText(structs.GetFormatted(location), color.White)
 			locationText.TextSize = 20
 			concertCard.Add(container.NewCenter(locationText))

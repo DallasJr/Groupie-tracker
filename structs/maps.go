@@ -3,6 +3,8 @@ package structs
 import (
 	"encoding/json"
 	"fmt"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"image"
 	"io"
 	"net/http"
@@ -13,6 +15,8 @@ import (
 const width = 300
 const height = 300
 const zoom = 4
+
+var ImageMap map[string]*canvas.Image
 
 type Map struct {
 	lat     float32
@@ -28,6 +32,16 @@ type LocResponse struct {
 	} `json:"results"`
 }
 
+func Generate(location string) {
+	m := NewMap(location)
+	m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")
+	img := m.GetImg()
+	fyneImg := canvas.NewImageFromImage(img)
+	fyneImg.FillMode = canvas.ImageFillContain
+	fyneImg.SetMinSize(fyne.NewSize(300, 300))
+	ImageMap[location] = fyneImg
+}
+
 func NewMap(center string) *Map {
 	parts := strings.Split(center, "-")
 	city := strings.Replace(parts[0], "_", "%20", -1)
@@ -39,7 +53,7 @@ func NewMap(center string) *Map {
 	}
 	defer res.Body.Close()
 	body, _ := io.ReadAll(res.Body)
-	fmt.Println("Position Status: " + strconv.Itoa(res.StatusCode))
+	//fmt.Println("Position Status: " + strconv.Itoa(res.StatusCode))
 	var locRes LocResponse
 	if err := json.Unmarshal(body, &locRes); err != nil {
 		fmt.Println("Error:", err)
@@ -48,8 +62,8 @@ func NewMap(center string) *Map {
 	if len(locRes.Results) > 0 {
 		lon := locRes.Results[0].Lon
 		lat := locRes.Results[0].Lat
-		fmt.Println("Longitude:", lon)
-		fmt.Println("Latitude:", lat)
+		//fmt.Println("Longitude:", lon)
+		//fmt.Println("Latitude:", lat)
 		return &Map{float32(lat), float32(lon), []Marker{}, zoom}
 	} else {
 		fmt.Println("No results found")
@@ -64,7 +78,7 @@ func (m *Map) GetImg() image.Image {
 		return nil
 	}
 	defer res.Body.Close()
-	fmt.Println("Map generation Status: " + strconv.Itoa(res.StatusCode))
+	//fmt.Println("Map generation Status: " + strconv.Itoa(res.StatusCode))
 	img, _, err := image.Decode(res.Body)
 	if err != nil {
 		fmt.Println("Error decoding image:", err)
