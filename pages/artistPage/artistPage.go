@@ -1,6 +1,7 @@
 package artistPage
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -13,6 +14,7 @@ import (
 
 func LoadPage(artist structs.Artist, myWindow fyne.Window) {
 	homeButton := widget.NewButton("Home", func() {
+
 	})
 	buttonContainer := container.NewVBox(homeButton)
 
@@ -48,6 +50,7 @@ func LoadPage(artist structs.Artist, myWindow fyne.Window) {
 	if len(artist.Locations) > 0 {
 		concerts := container.NewGridWithColumns(3)
 		for location, dates := range artist.Relations.DatesLocations {
+			fmt.Println(location)
 			concertCard := container.NewVBox()
 			m := structs.NewMap(location, 4)
 			m.AddMarker(m.GetLat(), m.GetLong(), "394e70", "users")
@@ -63,7 +66,7 @@ func LoadPage(artist structs.Artist, myWindow fyne.Window) {
 			concertCard.Add(container.NewCenter(datesLabel))
 
 			for _, date := range dates {
-				concertCard.Add(container.NewCenter(widget.NewLabel(date)))
+				concertCard.Add(container.NewCenter(widget.NewLabel(structs.GetFormattedDate(date))))
 			}
 			concerts.Add(concertCard)
 		}

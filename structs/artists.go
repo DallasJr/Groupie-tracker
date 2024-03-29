@@ -41,5 +41,9 @@ func (artist *Artist) GetImage() *canvas.Image {
 }
 
 func (artist *Artist) GetFirstAlbum() string {
-	return strings.ReplaceAll(artist.FirstAlbum, "-", "/")
+	return GetFormattedDate(artist.FirstAlbum)
+}
+
+func GetFormattedDate(date string) string {
+	return strings.ReplaceAll(date, "-", "/")
 }
