@@ -12,13 +12,15 @@ import (
 var Artists []Artist
 
 type Artist struct {
-	ID           int      `json:"id"`
-	Image        string   `json:"image"`
-	Name         string   `json:"name"`
-	Members      []string `json:"members"`
-	CreationDate int      `json:"creationDate"`
-	FirstAlbum   string   `json:"firstAlbum"`
-	Concerts     Concerts `json:"relations"`
+	ID           int       `json:"id"`
+	Image        string    `json:"image"`
+	Name         string    `json:"name"`
+	Members      []string  `json:"members"`
+	CreationDate int       `json:"creationDate"`
+	FirstAlbum   string    `json:"firstAlbum"`
+	Locations    []string  `json:"-"`
+	ConcertDates []string  `json:"-"`
+	Relations    Relations `json:"-"`
 }
 
 func (artist *Artist) GetImage() *canvas.Image {

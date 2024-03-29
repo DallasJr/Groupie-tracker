@@ -2,7 +2,8 @@ package structs
 
 import "strings"
 
-type Concerts struct {
+type Relations struct {
+	Id             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
 }
 

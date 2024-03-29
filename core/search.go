@@ -8,7 +8,6 @@ import (
 
 // Recherche d'artistes par nom
 func SearchArtistsByName(query string) []structs.Artist {
-	Load()
 	var results []structs.Artist
 	for _, artist := range structs.Artists {
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
@@ -45,6 +44,7 @@ func SearchArtistsByCreationYear(year int) []structs.Artist {
 
 // Recherche d'artistes générique
 func Search(query string) []structs.Artist {
+	Load()
 	var results []structs.Artist
 	// Recherche par nom d'artiste
 	nameResults := SearchArtistsByName(query)
@@ -61,17 +61,6 @@ func Search(query string) []structs.Artist {
 	}
 
 	for _, artist := range structs.Artists {
-		for loc := range artist.Locations {
-			if strings.Contains(strings.ToLower(artist.Locations[loc]), strings.ToLower(query)) {
-				results = append(results, artist)
-			}
-		}
-		for concertdate := range artist.ConcertDates {
-			if strings.Contains(strings.ToLower(artist.ConcertDates[concertdate]), strings.ToLower(query)) {
-				results = append(results, artist)
-			}
-		}
-
 		for location, dates := range artist.Relations.DatesLocations {
 			if strings.Contains(strings.ToLower(location), strings.ToLower(query)) {
 				results = append(results, artist)

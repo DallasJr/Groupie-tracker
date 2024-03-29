@@ -110,13 +110,13 @@ func loadRelations() {
 			return
 		}
 		// Décoder les données JSON
-		var relation structs.Relation
-		err = json.NewDecoder(response.Body).Decode(&relation)
+		var concerts structs.Relations
+		err = json.NewDecoder(response.Body).Decode(&concerts)
 		if err != nil {
 			fmt.Println("Erreur lors du décodage des données JSON :", err)
 			return
 		}
 
-		structs.Artists[i].Relations.DatesLocations = relation.DatesLocations
+		structs.Artists[i].Relations = concerts
 	}
 }
