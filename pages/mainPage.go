@@ -5,6 +5,7 @@ import (
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -16,16 +17,44 @@ import (
 )
 
 func LoadMainPage(myWindow fyne.Window) {
-
-	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
+	// Créer un titre pour la page
+	titleLabel := canvas.NewText("Groupie Tracker", color.White)
 	titleLabel.TextSize = 50
 
+	// Champ de recherche pour rechercher des artistes
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
 
+	// Boîte de suggestions pour afficher les suggestions de recherche
+	suggestionBox := container.NewVBox()
+
+	// Fonction pour mettre à jour les suggestions de recherche
+	updateSuggestions := func(text string) {
+		// Effacer les anciennes suggestions
+		suggestionBox.Objects = nil
+
+		// Rechercher des suggestions basées sur `text`
+		suggestions := core.GetSuggestions(text)
+
+		// Ajouter les nouvelles suggestions à la boîte de suggestions
+		for _, suggestion := range suggestions {
+			suggestion := suggestion // Capture de la portée
+			button := widget.NewButton(suggestion, func() {
+				// Diviser la suggestion en deux parties au niveau du tiret
+				parts := strings.SplitN(suggestion, " - ", 2)
+
+				// Remplacer le texte de recherche par la partie avant le tiret
+				searchEntry.SetText(parts[0])
+			})
+			suggestionBox.Add(button)
+		}
+	}
+
+	// Container pour afficher les résultats de la recherche
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
 
+	// Fonction pour effectuer la recherche
 	performSearch := func() {
 		resultsContainer.RemoveAll()
 		searchInput := searchEntry.Text
@@ -52,13 +81,14 @@ func LoadMainPage(myWindow fyne.Window) {
 			}
 			resultsContainer.Add(resultCard)
 		}
-
 	}
-	performSearch()
+
 	var latestSearch = time.Time{}
 
+	// Fonction de recherche déclenchée lors de la modification du texte de recherche
 	searchEntry.OnChanged = func(text string) {
 		latestSearch = time.Now()
+		updateSuggestions(text)
 		go func(thisTime time.Time) {
 			time.Sleep(1200 * time.Millisecond)
 			if latestSearch != thisTime {
@@ -67,6 +97,7 @@ func LoadMainPage(myWindow fyne.Window) {
 			} else {
 				fmt.Println("searched", text)
 				performSearch()
+
 			}
 		}(latestSearch)
 	}
@@ -141,6 +172,7 @@ func LoadMainPage(myWindow fyne.Window) {
 	topContainer := container.NewVBox(
 		container.NewCenter(titleLabel),
 		searchEntry,
+		suggestionBox,
 	)
 	bottomContainer := container.NewHBox(
 		filterContainer,
