@@ -15,7 +15,7 @@ import (
 const width = 300
 const height = 300
 const zoom = 4
-const apiKey = "0d79a284d16d4a62bb19944deed7af20"
+const apiKey = "fe25758143ce4092bc9eedf411dab42a"
 
 var ImageMap map[string]*canvas.Image
 
@@ -41,6 +41,14 @@ func GenerateMapImage(location string) {
 	fyneImg.FillMode = canvas.ImageFillContain
 	fyneImg.SetMinSize(fyne.NewSize(300, 300))
 	ImageMap[location] = fyneImg
+}
+
+func GetMapImage(location string) *canvas.Image {
+	if img, ok := ImageMap[location]; ok {
+		return img
+	}
+	blankImg := canvas.NewImageFromResource(nil)
+	return blankImg
 }
 
 func NewMap(center string) *Map {

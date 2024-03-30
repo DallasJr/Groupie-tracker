@@ -65,7 +65,7 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 		concerts := container.NewGridWithColumns(3)
 		for location, dates := range artist.Relations.DatesLocations {
 			concertCard := container.NewVBox()
-			concertCard.Add(structs.ImageMap[location])
+			concertCard.Add(structs.GetMapImage(location))
 			locationText := canvas.NewText(structs.GetFormatted(location), color.White)
 			locationText.TextSize = 20
 			concertCard.Add(container.NewCenter(locationText))

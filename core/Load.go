@@ -110,10 +110,10 @@ func loadLocations() {
 		// Assigner les locations à l'artiste correspondant
 		structs.Artists[i].Locations = locations.Locations
 	}
-	fmt.Println("Loading Map images")
+	/*fmt.Println("Loading Map images")
 	for _, loc := range allLocations {
 		go structs.GenerateMapImage(loc)
-	}
+	}*/
 }
 
 func loadDate() {

@@ -34,18 +34,18 @@ func LoadMainPage(myWindow fyne.Window) {
 			art := art
 			picture := art.GetImage()
 			artistLabel := widget.NewLabel(art.Name)
-			infoButton := widget.NewButton("", func() {
+			button := widget.NewButton("", func() {
 				LoadArtistPage(art, myWindow)
 			})
-			infoButton.Importance = widget.LowImportance
-			infoButton.SetIcon(theme.NavigateNextIcon())
+			button.Importance = widget.LowImportance
+			button.SetIcon(theme.NavigateNextIcon())
 			namepicture := container.NewGridWithColumns(2,
 				picture,
 				artistLabel,
 			)
 			resultCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
 				namepicture,
-				infoButton)
+				button)
 			for resultCard.MinSize().Width <= 404 {
 				artistLabel.Text += " "
 				artistLabel.Refresh()
@@ -164,7 +164,16 @@ func LoadMainPage(myWindow fyne.Window) {
 			favoriteCard.Add(image)
 			artistLabel := widget.NewLabel(structs.GetArtist(favorite).Name)
 			favoriteCard.Add(container.NewCenter(artistLabel))
-			favorites.Add(favoriteCard)
+
+			button := widget.NewButton("", func() {
+				LoadArtistPage(artist, myWindow)
+			})
+			button.Importance = widget.LowImportance
+			button.SetIcon(theme.NavigateNextIcon())
+			finalCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
+				favoriteCard,
+				container.NewGridWithColumns(3, layout.NewSpacer(), button, layout.NewSpacer()))
+			favorites.Add(finalCard)
 		}
 		favoriteContainer.Add(favorites)
 	}
