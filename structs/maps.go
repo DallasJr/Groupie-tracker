@@ -80,6 +80,24 @@ func NewMap(center string) *Map {
 	}
 }
 
+func GetFormattedLocationName(location string) (string, string) {
+	parts := strings.Split(location, "-")
+	city := strings.Replace(parts[0], "_", " ", -1)
+	country := strings.Replace(parts[1], "_", " ", -1)
+	words := strings.Fields(city)
+	for i, word := range words {
+		words[i] = strings.ToUpper(string(word[0])) + word[1:]
+	}
+	city = strings.Join(words, " ")
+	country = strings.ToUpper(string(country[0])) + country[1:]
+	words = strings.Fields(country)
+	for i, word := range words {
+		words[i] = strings.ToUpper(string(word[0])) + word[1:]
+	}
+	country = strings.Join(words, " ")
+	return city, country
+}
+
 func (m *Map) GetImg() image.Image {
 	url := m.GetURL()
 	res, err := http.Get(url)

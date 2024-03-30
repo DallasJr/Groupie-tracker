@@ -1,7 +1,9 @@
 package core
 
 import (
+	"fmt"
 	"groupie-tracker/structs"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -42,6 +44,28 @@ func SearchArtistsByCreationYear(year int) []structs.Artist {
 	return results
 }
 
+// Recherche d'artistes par année du premiere album
+func SearchArtistsByFirstAlbumYear(year int) []structs.Artist {
+	var results []structs.Artist
+	for _, artist := range structs.Artists {
+		if getYearFromDate(artist.FirstAlbum) == year {
+			results = append(results, artist)
+		}
+	}
+	return results
+}
+
+// Recherche d'artistes par date du premiere album
+func SearchArtistsByFirstAlbumDate(date string) []structs.Artist {
+	var results []structs.Artist
+	for _, artist := range structs.Artists {
+		if artist.FirstAlbum == strings.Replace(date, "/", "-", -1) {
+			results = append(results, artist)
+		}
+	}
+	return results
+}
+
 // Recherche d'artistes générique
 func Search(query string) []structs.Artist {
 	//Load()
@@ -60,15 +84,26 @@ func Search(query string) []structs.Artist {
 		results = append(results, yearResults...)
 	}
 
+	// Recherche par année de première album
+	if year, err := strconv.Atoi(query); err == nil {
+		yearResults := SearchArtistsByFirstAlbumYear(year)
+		results = append(results, yearResults...)
+	}
+
+	// Recherche par date de première album
+	if isValidDateFormat(query) {
+		yearResults := SearchArtistsByFirstAlbumDate(query)
+		results = append(results, yearResults...)
+	}
+
+	// Recherche par localisations des concerts
 	for _, artist := range structs.Artists {
-		for location, dates := range artist.Relations.DatesLocations {
-			if strings.Contains(strings.ToLower(location), strings.ToLower(query)) {
+		for location, _ := range artist.Relations.DatesLocations {
+			city, country := structs.GetFormattedLocationName(location)
+			city = strings.Replace(city, " ", "", -1)
+			country = strings.Replace(country, " ", "", -1)
+			if strings.Contains(strings.ToLower(city), strings.ToLower(query)) || strings.Contains(strings.ToLower(country), strings.ToLower(query)) {
 				results = append(results, artist)
-			}
-			for _, date := range dates {
-				if strings.Contains(strings.ToLower(date), strings.ToLower(query)) {
-					results = append(results, artist)
-				}
 			}
 		}
 	}
@@ -105,4 +140,22 @@ func GetSuggestions(query string) []string {
 	}
 
 	return suggestions
+}
+
+func isValidDateFormat(date string) bool {
+	pattern := `^\d{2}/\d{2}/\d{4}$|^\d{2}-\d{2}-\d{4}$`
+	regex := regexp.MustCompile(pattern)
+	return regex.MatchString(date)
+}
+
+func getYearFromDate(date string) int {
+	parts := strings.Split(date, "-")
+	yearStr := parts[len(parts)-1]
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		fmt.Println("Error converting year to integer:", err)
+		return 0
+	}
+
+	return year
 }

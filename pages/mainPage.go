@@ -156,14 +156,13 @@ func LoadMainPage(myWindow fyne.Window) {
 	favoritesLabel.TextSize = 30
 	favoriteContainer.Add(container.NewCenter(favoritesLabel))
 	if len(core.Favorites) > 0 {
-		favorites := container.NewGridWithColumns(3)
+		favorites := container.NewGridWithColumns(4)
 		for _, favorite := range core.Favorites {
-			favoriteCard := container.NewVBox()
 			artist := structs.GetArtist(favorite)
 			image := artist.GetImage()
-			favoriteCard.Add(image)
 			artistLabel := widget.NewLabel(structs.GetArtist(favorite).Name)
-			favoriteCard.Add(container.NewCenter(artistLabel))
+
+			card := widget.NewCard("", "", container.NewVBox(image, container.NewCenter(artistLabel)))
 
 			button := widget.NewButton("", func() {
 				LoadArtistPage(artist, myWindow)
@@ -171,7 +170,7 @@ func LoadMainPage(myWindow fyne.Window) {
 			button.Importance = widget.LowImportance
 			button.SetIcon(theme.NavigateNextIcon())
 			finalCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
-				favoriteCard,
+				card,
 				container.NewGridWithColumns(3, layout.NewSpacer(), button, layout.NewSpacer()))
 			favorites.Add(finalCard)
 		}
