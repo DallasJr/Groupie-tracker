@@ -17,44 +17,35 @@ import (
 )
 
 func LoadMainPage(myWindow fyne.Window) {
-	// Créer un titre pour la page
-	titleLabel := canvas.NewText("Groupie Tracker", color.White)
+	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
 	titleLabel.TextSize = 50
 
-	// Champ de recherche pour rechercher des artistes
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
 
-	// Boîte de suggestions pour afficher les suggestions de recherche
 	suggestionBox := container.NewVBox()
 
-	// Fonction pour mettre à jour les suggestions de recherche
 	updateSuggestions := func(text string) {
-		// Effacer les anciennes suggestions
+
 		suggestionBox.Objects = nil
 
-		// Rechercher des suggestions basées sur `text`
 		suggestions := core.GetSuggestions(text)
 
-		// Ajouter les nouvelles suggestions à la boîte de suggestions
 		for _, suggestion := range suggestions {
-			suggestion := suggestion // Capture de la portée
+			suggestion := suggestion
 			button := widget.NewButton(suggestion, func() {
-				// Diviser la suggestion en deux parties au niveau du tiret
+
 				parts := strings.SplitN(suggestion, " - ", 2)
 
-				// Remplacer le texte de recherche par la partie avant le tiret
 				searchEntry.SetText(parts[0])
 			})
 			suggestionBox.Add(button)
 		}
 	}
 
-	// Container pour afficher les résultats de la recherche
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
 
-	// Fonction pour effectuer la recherche
 	performSearch := func() {
 		resultsContainer.RemoveAll()
 		searchInput := searchEntry.Text
@@ -85,7 +76,6 @@ func LoadMainPage(myWindow fyne.Window) {
 
 	var latestSearch = time.Time{}
 
-	// Fonction de recherche déclenchée lors de la modification du texte de recherche
 	searchEntry.OnChanged = func(text string) {
 		latestSearch = time.Now()
 		updateSuggestions(text)
