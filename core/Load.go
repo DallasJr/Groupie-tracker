@@ -74,9 +74,10 @@ func LoadArtists() {
 	}
 	fmt.Println("Loading artists images")
 	for _, artist := range structs.Artists {
-		InitializeFiltersValues(artist)
+		InitializeFiltersValues(artist, true)
 		go structs.StoreArtistImage(artist)
 	}
+	InitializeFiltersValues(structs.Artist{}, false)
 }
 
 func loadLocations() {

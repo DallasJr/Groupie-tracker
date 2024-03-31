@@ -54,7 +54,7 @@ func Search(query string) []structs.Artist {
 
 	// Supprimer les doublons potentiels
 	results = removeDuplicates(results)
-
+	results = GetFiltered(results)
 	return results
 }
 
