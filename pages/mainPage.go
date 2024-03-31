@@ -24,11 +24,13 @@ func LoadMainPage(myWindow fyne.Window) {
 	suggestionBox := container.NewVBox()
 
 	updateSuggestions := func(text string) {
-
 		suggestionBox.Objects = nil
-
 		suggestions := core.GetSuggestions(text)
-		if len(suggestions) < 10 {
+		if len(suggestions) > 10 {
+			button := widget.NewButton("Too much results", func() {
+			})
+			suggestionBox.Add(button)
+		} else {
 			for _, suggestion := range suggestions {
 				suggestion := suggestion
 				button := widget.NewButton(suggestion, func() {
@@ -38,6 +40,7 @@ func LoadMainPage(myWindow fyne.Window) {
 				suggestionBox.Add(button)
 			}
 		}
+
 	}
 
 	resultsContainer := container.NewVBox()
@@ -151,7 +154,7 @@ func LoadMainPage(myWindow fyne.Window) {
 	for _, locsCheck := range locsCheck {
 		locations.Add(locsCheck)
 	}
-	lab := widget.NewLabel(" \n \n \n \n \n \n \n")
+	lab := widget.NewLabel("\n\n\n\n\n\n\n")
 	locationsContainer := container.NewVBox(widget.NewLabel("Locations"), container.NewHBox(lab, container.NewVScroll(locations)))
 
 	applyButton := widget.NewButton("Apply Filters", func() {
