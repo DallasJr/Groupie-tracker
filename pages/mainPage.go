@@ -5,6 +5,7 @@ import (
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -16,12 +17,31 @@ import (
 )
 
 func LoadMainPage(myWindow fyne.Window) {
-
 	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
 	titleLabel.TextSize = 50
 
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search here")
+
+	suggestionBox := container.NewVBox()
+
+	updateSuggestions := func(text string) {
+
+		suggestionBox.Objects = nil
+
+		suggestions := core.GetSuggestions(text)
+
+		for _, suggestion := range suggestions {
+			suggestion := suggestion
+			button := widget.NewButton(suggestion, func() {
+
+				parts := strings.SplitN(suggestion, " - ", 2)
+
+				searchEntry.SetText(parts[0])
+			})
+			suggestionBox.Add(button)
+		}
+	}
 
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
@@ -52,13 +72,13 @@ func LoadMainPage(myWindow fyne.Window) {
 			}
 			resultsContainer.Add(resultCard)
 		}
-
 	}
-	performSearch()
+
 	var latestSearch = time.Time{}
 
 	searchEntry.OnChanged = func(text string) {
 		latestSearch = time.Now()
+		updateSuggestions(text)
 		go func(thisTime time.Time) {
 			time.Sleep(1200 * time.Millisecond)
 			if latestSearch != thisTime {
@@ -67,6 +87,7 @@ func LoadMainPage(myWindow fyne.Window) {
 			} else {
 				fmt.Println("searched", text)
 				performSearch()
+
 			}
 		}(latestSearch)
 	}
@@ -177,6 +198,7 @@ func LoadMainPage(myWindow fyne.Window) {
 	topContainer := container.NewVBox(
 		container.NewCenter(titleLabel),
 		searchEntry,
+		suggestionBox,
 	)
 	bottomContainer := container.NewHBox(
 		filterContainer,

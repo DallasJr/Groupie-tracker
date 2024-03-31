@@ -130,11 +130,49 @@ func removeDuplicates(artists []structs.Artist) []structs.Artist {
 
 func GetSuggestions(query string) []string {
 	var suggestions []string
+	if query == "" {
+		return suggestions
+	}
 
 	for _, artist := range structs.Artists {
-		// Vérifier si le nom de l'artiste contient la chaîne de caractères de la requête
+		matches := make(map[string]bool) // Pour garder une trace des types de correspondances trouvées
+
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
-			suggestions = append(suggestions, artist.Name)
+			matches["Artist"] = true
+		}
+
+		for _, member := range artist.Members {
+			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
+				matches["Member"] = true
+			}
+		}
+
+		for _, loc := range artist.Locations {
+			if strings.Contains(strings.ToLower(loc), strings.ToLower(query)) {
+				matches["Locations"] = true
+			}
+		}
+
+		if strings.Contains(strings.ToLower(artist.FirstAlbum), strings.ToLower(query)) {
+			matches["First Album"] = true
+		}
+
+		if strings.Contains(strings.ToLower(fmt.Sprint(artist.CreationDate)), strings.ToLower(query)) {
+			matches["Creation Date"] = true
+		}
+
+		for location, _ := range artist.Relations.DatesLocations {
+			if strings.Contains(strings.ToLower(location), strings.ToLower(query)) {
+				matches["Concert Dates"] = true
+			}
+		}
+
+		if len(matches) > 0 {
+			var matchTypes []string
+			for match := range matches {
+				matchTypes = append(matchTypes, match)
+			}
+			suggestions = append(suggestions, fmt.Sprintf("%s - %s", artist.Name, strings.Join(matchTypes, "/")))
 		}
 	}
 
