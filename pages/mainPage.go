@@ -73,46 +73,81 @@ func LoadMainPage(myWindow fyne.Window) {
 
 	//Filters:
 	// Déclaration et initialisation des sliders pour Creation Date Range
-	sliderCreationDateStart := widget.NewSlider(0, 2024)
-	sliderCreationDateEnd := widget.NewSlider(0, 2024)
+	creationDateSliderMin := widget.NewSlider(float64(core.CreationDateRange[0]), float64(core.CreationDateRange[1]))
+	creationDateSliderMax := widget.NewSlider(float64(core.CreationDateRange[0]), float64(core.CreationDateRange[1]))
+	creationDateSliderMax.SetValue(float64(core.CreationDateRange[1]))
+	firstAlbumSliderMin := widget.NewSlider(float64(core.FirstAlbumDateRange[0]), float64(core.FirstAlbumDateRange[1]))
+	firstAlbumSliderMax := widget.NewSlider(float64(core.FirstAlbumDateRange[0]), float64(core.FirstAlbumDateRange[1]))
+	firstAlbumSliderMax.SetValue(float64(core.FirstAlbumDateRange[1]))
+	numberOfMembersSliderMin := widget.NewSlider(float64(core.NumberOfMembersRange[0]), float64(core.NumberOfMembersRange[1]))
+	numberOfMembersSliderMax := widget.NewSlider(float64(core.NumberOfMembersRange[0]), float64(core.NumberOfMembersRange[1]))
+	numberOfMembersSliderMax.SetValue(float64(core.NumberOfMembersRange[1]))
 
-	creationDateRange := container.NewVBox(
-		widget.NewLabel("Creation Date Range"),
-		sliderCreationDateStart,
-		sliderCreationDateEnd,
-	)
+	creationDateLabel := widget.NewLabel(fmt.Sprintf("Creation Date Range: %d - %d", core.CreationDateRange[0], core.CreationDateRange[1]))
+	firstAlbumLabel := widget.NewLabel(fmt.Sprintf("First Album Date Range: %d - %d", core.FirstAlbumDateRange[0], core.FirstAlbumDateRange[1]))
+	numberOfMembersLabel := widget.NewLabel(fmt.Sprintf("Number of Members Range: %d - %d", core.NumberOfMembersRange[0], core.NumberOfMembersRange[1]))
 
-	// Déclaration et initialisation des sliders pour First Album Date Range
-	sliderFirstAlbumStart := widget.NewSlider(0, 2024)
-	sliderFirstAlbumEnd := widget.NewSlider(0, 2024)
+	updateLabels := func() {
+		creationDateLabel.SetText(fmt.Sprintf("Creation Date Range: %d - %d", int(creationDateSliderMin.Value), int(creationDateSliderMax.Value)))
+		firstAlbumLabel.SetText(fmt.Sprintf("First Album Date Range: %d - %d", int(firstAlbumSliderMin.Value), int(firstAlbumSliderMax.Value)))
+		numberOfMembersLabel.SetText(fmt.Sprintf("Number of Members Range: %d - %d", int(numberOfMembersSliderMin.Value), int(numberOfMembersSliderMax.Value)))
+	}
 
-	firstAlbumRange := container.NewVBox(
-		widget.NewLabel("First Album Date Range"),
-		sliderFirstAlbumStart,
-		sliderFirstAlbumEnd,
-	)
+	creationDateSliderMin.OnChanged = func(value float64) {
+		if creationDateSliderMin.Value >= creationDateSliderMax.Value {
+			creationDateSliderMin.SetValue(creationDateSliderMax.Value)
+		}
+		updateLabels()
+	}
+	creationDateSliderMax.OnChanged = func(value float64) {
+		if creationDateSliderMax.Value <= creationDateSliderMin.Value {
+			creationDateSliderMax.SetValue(creationDateSliderMin.Value)
+		}
+		updateLabels()
+	}
 
-	// Déclaration et initialisation de l'entry pour Number of Members
-	entryNumMembers := widget.NewEntry()
+	firstAlbumSliderMin.OnChanged = func(value float64) {
+		if firstAlbumSliderMin.Value >= firstAlbumSliderMax.Value {
+			firstAlbumSliderMin.SetValue(firstAlbumSliderMax.Value)
+		}
+		updateLabels()
+	}
+	firstAlbumSliderMax.OnChanged = func(value float64) {
+		if firstAlbumSliderMax.Value <= firstAlbumSliderMin.Value {
+			firstAlbumSliderMax.SetValue(firstAlbumSliderMin.Value)
+		}
+		updateLabels()
+	}
 
-	numMembers := container.NewVBox(
-		widget.NewLabel("Number of Members"),
-		entryNumMembers,
-	)
+	numberOfMembersSliderMin.OnChanged = func(value float64) {
+		if numberOfMembersSliderMin.Value >= numberOfMembersSliderMax.Value {
+			numberOfMembersSliderMin.SetValue(numberOfMembersSliderMax.Value)
+		}
+		updateLabels()
+	}
+	numberOfMembersSliderMax.OnChanged = func(value float64) {
+		if numberOfMembersSliderMax.Value <= numberOfMembersSliderMin.Value {
+			numberOfMembersSliderMax.SetValue(numberOfMembersSliderMin.Value)
+		}
+		updateLabels()
+	}
 
-	// Déclaration et initialisation des checkboxes pour Locations
-	checkUSA := widget.NewCheck("USA", func(checked bool) {})
-	checkUK := widget.NewCheck("UK", func(checked bool) {})
-	checkFR := widget.NewCheck("FR", func(checked bool) {})
+	creationDateContainer := container.NewVBox(widget.NewSeparator(), creationDateLabel, creationDateSliderMin, creationDateSliderMax)
+	firstAlbumContainer := container.NewVBox(widget.NewSeparator(), firstAlbumLabel, firstAlbumSliderMin, firstAlbumSliderMax)
+	numberOfMembersContainer := container.NewVBox(widget.NewSeparator(), numberOfMembersLabel, numberOfMembersSliderMin, numberOfMembersSliderMax)
 
-	locations := container.NewVBox(
-		widget.NewLabel("Locations"),
-		container.NewHBox(
-			checkUSA,
-			checkUK,
-			checkFR,
-		),
-	)
+	locations := container.NewGridWithColumns(2)
+	var locsCheck []*widget.Check
+	for _, location := range core.LocationsCountry {
+		locsCheck = append(locsCheck, widget.NewCheck(core.FirstLetterUpper(location), func(checked bool) {
+
+		}))
+	}
+	for _, locsCheck := range locsCheck {
+		locations.Add(locsCheck)
+	}
+	lab := widget.NewLabel(" \n \n \n \n \n \n \n")
+	locationsContainer := container.NewVBox(widget.NewLabel("Locations"), container.NewHBox(lab, container.NewVScroll(locations)))
 
 	applyButton := widget.NewButton("Apply Filters", func() {
 
@@ -120,22 +155,23 @@ func LoadMainPage(myWindow fyne.Window) {
 
 	resetButton := widget.NewButton("Reset Filters", func() {
 		// Ici, vous pouvez maintenant accéder directement aux variables
-		sliderCreationDateStart.SetValue(0)
-		sliderCreationDateEnd.SetValue(0)
-		sliderFirstAlbumStart.SetValue(0)
-		sliderFirstAlbumEnd.SetValue(0)
-		entryNumMembers.SetText("")
-		checkUSA.SetChecked(false)
-		checkUK.SetChecked(false)
-		checkFR.SetChecked(false)
+		creationDateSliderMin.SetValue(float64(core.CreationDateRange[0]))
+		creationDateSliderMax.SetValue(float64(core.CreationDateRange[1]))
+		firstAlbumSliderMin.SetValue(float64(core.FirstAlbumDateRange[0]))
+		firstAlbumSliderMax.SetValue(float64(core.FirstAlbumDateRange[1]))
+		numberOfMembersSliderMin.SetValue(float64(core.NumberOfMembersRange[0]))
+		numberOfMembersSliderMax.SetValue(float64(core.NumberOfMembersRange[1]))
+		for _, box := range locsCheck {
+			box.SetChecked(false)
+		}
 	})
 
 	filterContainer := container.NewVBox(
-		creationDateRange,
-		firstAlbumRange,
-		numMembers,
-		locations,
-		container.NewHBox(applyButton, resetButton),
+		creationDateContainer,
+		firstAlbumContainer,
+		numberOfMembersContainer,
+		locationsContainer,
+		container.NewGridWithColumns(2, applyButton, resetButton),
 	)
 
 	topContainer := container.NewVBox(

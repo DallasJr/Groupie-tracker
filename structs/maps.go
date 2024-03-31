@@ -89,7 +89,6 @@ func GetFormattedLocationName(location string) (string, string) {
 		words[i] = strings.ToUpper(string(word[0])) + word[1:]
 	}
 	city = strings.Join(words, " ")
-	country = strings.ToUpper(string(country[0])) + country[1:]
 	words = strings.Fields(country)
 	for i, word := range words {
 		words[i] = strings.ToUpper(string(word[0])) + word[1:]

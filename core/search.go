@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"groupie-tracker/structs"
 	"regexp"
 	"strconv"
@@ -146,16 +145,4 @@ func isValidDateFormat(date string) bool {
 	pattern := `^\d{2}/\d{2}/\d{4}$|^\d{2}-\d{2}-\d{4}$`
 	regex := regexp.MustCompile(pattern)
 	return regex.MatchString(date)
-}
-
-func getYearFromDate(date string) int {
-	parts := strings.Split(date, "-")
-	yearStr := parts[len(parts)-1]
-	year, err := strconv.Atoi(yearStr)
-	if err != nil {
-		fmt.Println("Error converting year to integer:", err)
-		return 0
-	}
-
-	return year
 }

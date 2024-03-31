@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 )
 
 func Load() {
@@ -72,6 +74,7 @@ func LoadArtists() {
 	}
 	fmt.Println("Loading artists images")
 	for _, artist := range structs.Artists {
+		InitializeFiltersValues(artist)
 		go structs.StoreArtistImage(artist)
 	}
 }
@@ -110,10 +113,15 @@ func loadLocations() {
 		// Assigner les locations à l'artiste correspondant
 		structs.Artists[i].Locations = locations.Locations
 	}
-	/*fmt.Println("Loading Map images")
+	fmt.Println("Loading Map images")
 	for _, loc := range allLocations {
-		go structs.GenerateMapImage(loc)
-	}*/
+		_, country := structs.GetFormattedLocationName(loc)
+		if !ContainsString(LocationsCountry, strings.ToLower(country)) {
+			LocationsCountry = append(LocationsCountry, strings.ToLower(country))
+		}
+		//go structs.GenerateMapImage(loc)
+	}
+	sort.Strings(LocationsCountry)
 }
 
 func loadDate() {
