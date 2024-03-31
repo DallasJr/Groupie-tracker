@@ -2,18 +2,16 @@ package pages
 
 import (
 	"fmt"
-	"groupie-tracker/core"
-	"groupie-tracker/structs"
-	"image/color"
-	"strings"
-	"time"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"groupie-tracker/core"
+	"groupie-tracker/structs"
+	"image/color"
+	"strings"
 )
 
 func LoadMainPage(myWindow fyne.Window) {
@@ -30,16 +28,15 @@ func LoadMainPage(myWindow fyne.Window) {
 		suggestionBox.Objects = nil
 
 		suggestions := core.GetSuggestions(text)
-
-		for _, suggestion := range suggestions {
-			suggestion := suggestion
-			button := widget.NewButton(suggestion, func() {
-
-				parts := strings.SplitN(suggestion, " - ", 2)
-
-				searchEntry.SetText(parts[0])
-			})
-			suggestionBox.Add(button)
+		if len(suggestions) < 10 {
+			for _, suggestion := range suggestions {
+				suggestion := suggestion
+				button := widget.NewButton(suggestion, func() {
+					parts := strings.SplitN(suggestion, " - ", 2)
+					searchEntry.SetText(parts[0])
+				})
+				suggestionBox.Add(button)
+			}
 		}
 	}
 
@@ -73,23 +70,10 @@ func LoadMainPage(myWindow fyne.Window) {
 			resultsContainer.Add(resultCard)
 		}
 	}
-
-	var latestSearch = time.Time{}
-
+	performSearch()
 	searchEntry.OnChanged = func(text string) {
-		latestSearch = time.Now()
 		updateSuggestions(text)
-		go func(thisTime time.Time) {
-			time.Sleep(1200 * time.Millisecond)
-			if latestSearch != thisTime {
-				fmt.Println("ignored", text)
-				return
-			} else {
-				fmt.Println("searched", text)
-				performSearch()
-
-			}
-		}(latestSearch)
+		performSearch()
 	}
 
 	//Filters:
@@ -153,11 +137,11 @@ func LoadMainPage(myWindow fyne.Window) {
 		updateLabels()
 	}
 
-	creationDateContainer := container.NewVBox(widget.NewSeparator(), creationDateLabel, creationDateSliderMin, creationDateSliderMax)
+	creationDateContainer := container.NewVBox(creationDateLabel, creationDateSliderMin, creationDateSliderMax)
 	firstAlbumContainer := container.NewVBox(widget.NewSeparator(), firstAlbumLabel, firstAlbumSliderMin, firstAlbumSliderMax)
 	numberOfMembersContainer := container.NewVBox(widget.NewSeparator(), numberOfMembersLabel, numberOfMembersSliderMin, numberOfMembersSliderMax)
 
-	locations := container.NewGridWithColumns(2)
+	locations := container.NewGridWithColumns(1)
 	var locsCheck []*widget.Check
 	for _, location := range core.LocationsCountry {
 		locsCheck = append(locsCheck, widget.NewCheck(core.FirstLetterUpper(location), func(checked bool) {
