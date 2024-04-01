@@ -26,6 +26,8 @@ type Artist struct {
 
 var ImageArtist map[int]*canvas.Image
 
+// On charge les images des artistes depuis l'API
+// et les stock dans la map artist/image ImageArtist
 func StoreArtistImage(artist Artist) {
 	resp, err := http.Get(artist.Image)
 	if err != nil {
@@ -42,10 +44,16 @@ func StoreArtistImage(artist Artist) {
 }
 
 func (artist *Artist) GetImage() *canvas.Image {
+
+	// Récupéré depuis la map artist/image
 	formatted := canvas.NewImageFromImage(ImageArtist[artist.ID].Image)
+
+	//Formattage
 	formatted.FillMode = canvas.ImageFillContain
 	formatted.SetMinSize(fyne.NewSize(100, 100))
+
 	return formatted
+
 }
 
 func (artist *Artist) GetFirstAlbum() string {

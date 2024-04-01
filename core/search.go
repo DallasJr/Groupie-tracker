@@ -11,31 +11,36 @@ func Search(query string) []structs.Artist {
 	var results []structs.Artist
 
 	for _, artist := range structs.Artists {
+
+		// Si le query est contenu dans le nom
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
 			results = append(results, artist)
 			continue
 		}
+
+		// Si le query est contenu dans le nom d'un membres
 		for _, member := range artist.Members {
 			if strings.Contains(strings.ToLower(member), strings.ToLower(query)) {
 				results = append(results, artist)
 				continue
 			}
 		}
-		for _, loc := range artist.Locations {
-			if strings.Contains(strings.ToLower(loc), strings.ToLower(query)) {
-				results = append(results, artist)
-				continue
-			}
-		}
+
+		// Si le query est contenu dans la date du 1er album
 		if strings.Contains(strings.ToLower(artist.FirstAlbum), strings.ToLower(strings.Replace(query, "/", "-", -1))) {
 			results = append(results, artist)
 			continue
 		}
+
+		// Si le query est contenu dans l'année de création
 		if strings.Contains(strings.ToLower(fmt.Sprint(artist.CreationDate)), strings.ToLower(query)) {
 			results = append(results, artist)
 			continue
 		}
+
+		// Si le query est contenu dans le nom des localisations
 		for _, location := range artist.Locations {
+			// Vérifie si chaque mots du query est contenu dans une localisation
 			ok := false
 			for _, words := range strings.Fields(query) {
 				if strings.Contains(strings.ToLower(location), strings.ToLower(words)) {
@@ -54,7 +59,10 @@ func Search(query string) []structs.Artist {
 
 	// Supprimer les doublons potentiels
 	results = removeDuplicates(results)
+
+	// Applique les filtres
 	results = GetFiltered(results)
+
 	return results
 }
 

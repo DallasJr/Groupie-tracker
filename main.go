@@ -15,11 +15,15 @@ func main() {
 
 	fmt.Println("Launching app . . .")
 
-	//load les Artists depuis l'API
+	// Load les Artists depuis l'API
 	core.Load()
+
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Groupie Tracker")
+
+	// Récuperer le contenu de la page principale
 	pages.LoadMainPage(myWindow)
+
 	myWindow.Resize(fyne.NewSize(resX, resY))
 	myWindow.ShowAndRun()
 }

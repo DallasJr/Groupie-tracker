@@ -17,21 +17,32 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 	homeButton := widget.NewButton("Home", func() {
 		LoadMainPage(myWindow)
 	})
+
 	var favButton *widget.Button
 	favButton = widget.NewButton("Favorite ", func() {
+
+		// Ajoute ou retire l'artiste des favoris
 		if containsInt(core.Favorites, artist.ID) {
 			core.RemoveFavorite(artist.ID)
 		} else {
 			core.AddFavorite(artist.ID)
 		}
+
+		// Refresh l'icon du bouton favoris
 		setFavButtonIcon(favButton, artist.ID)
+
+		// Sauvegarde dans le fichier
 		err := core.SaveFavorites()
 		if err != nil {
 			return
 		}
+
 	})
+	// Refresh l'icon du bouton favoris
 	setFavButtonIcon(favButton, artist.ID)
+
 	buttonContainer := container.NewGridWithColumns(2, container.NewVBox(homeButton), container.NewVBox(favButton))
+
 	picture := artist.GetImage()
 	picture.FillMode = canvas.ImageFillContain
 	picture.SetMinSize(fyne.NewSize(150, 150))
@@ -41,6 +52,7 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 
 	title := container.NewGridWithColumns(4, layout.NewSpacer(), picture, container.NewCenter(artistLabel), layout.NewSpacer())
 
+	// Membres
 	membersList := widget.NewAccordion()
 	groupContainer := container.NewVBox()
 	for _, member := range artist.Members {
@@ -51,12 +63,17 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 	membersItem.Open = true
 	membersList.Append(membersItem)
 
+	// Date de création
 	creation := canvas.NewText("Since "+strconv.Itoa(artist.CreationDate), color.White)
 	creation.TextSize = 50
+
+	// Date du 1er album
 	firstAlbum := canvas.NewText("First Album: "+artist.GetFirstAlbum(), color.White)
 	firstAlbum.TextSize = 50
+
 	datesContainer := container.NewVBox(widget.NewSeparator(), container.NewCenter(creation), widget.NewSeparator(), container.NewCenter(firstAlbum), widget.NewSeparator())
 
+	// Affichage des concerts (lieu + dates)
 	concertsContainer := container.NewVBox()
 	concertsLabel := canvas.NewText("Concerts:", color.White)
 	concertsLabel.TextSize = 50
@@ -86,6 +103,7 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 		concertsContainer.Add(noConcerts)
 		concertsContainer.Add(widget.NewSeparator())
 	}
+
 	content := container.NewVScroll(container.NewVBox(buttonContainer, title, membersList, datesContainer, concertsContainer))
 	myWindow.SetContent(content)
 }

@@ -44,62 +44,95 @@ func LoadMainPage(myWindow fyne.Window) {
 
 	resultsContainer := container.NewVBox()
 	var searchResults []structs.Artist
+
+	// Fonction pour effectuer une recherche
 	performSearch := func() {
+
+		// Supprimer les anciens résultats
 		resultsContainer.RemoveAll()
+
+		// Récuperer l'input
 		searchInput := searchEntry.Text
+
+		// Lancer la recherche
 		searchResults = core.Search(searchInput)
+
+		// Pour chaque résultat, on crée son objet
 		for _, art := range searchResults {
+
+			// On redéfini 'art' pour récuperer la bonne valeur de 'art'
+			// pour éviter de se référer à la même variable art
 			art := art
+
+			// Récuperer et formatter l'image de l'artist
 			picture := art.GetImage()
+
 			artistLabel := widget.NewLabel(art.Name)
+
+			// Le bouton rédirige vers le profile de l'artiste
 			button := widget.NewButton("", func() {
 				LoadArtistPage(art, myWindow)
 			})
+
+			// Le bouton est transparent de base et visible quand on a le curseur dessus
 			button.Importance = widget.LowImportance
+
 			button.SetIcon(theme.NavigateNextIcon())
 			namepicture := container.NewGridWithColumns(2,
 				picture,
 				artistLabel,
 			)
+
+			// Le bouton est par dessus du container comportant l'image et le nom
 			resultCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
 				namepicture,
 				button)
+
 			for resultCard.MinSize().Width <= 404 {
 				artistLabel.Text += " "
 				artistLabel.Refresh()
 			}
 			resultsContainer.Add(resultCard)
 		}
+
 	}
+
+	// Fonction qui s'execute quand l'utilisateur modifie dans la bar de recherche
 	searchEntry.OnChanged = func(text string) {
 		updateSuggestions(text)
 		performSearch()
 	}
 
-	//Filters:
-	// Déclaration et initialisation des sliders pour Creation Date Range
+	// Filters:
+	// Déclaration et initialisation des sliders
+	// Date de création
 	creationDateSliderMin := widget.NewSlider(float64(core.CreationDateRange[0]), float64(core.CreationDateRange[1]))
 	creationDateSliderMin.SetValue(core.CreationDateValue[0])
 	creationDateSliderMax := widget.NewSlider(float64(core.CreationDateRange[0]), float64(core.CreationDateRange[1]))
 	creationDateSliderMax.SetValue(core.CreationDateValue[1])
 
+	// 1ère Album
 	firstAlbumSliderMin := widget.NewSlider(float64(core.FirstAlbumDateRange[0]), float64(core.FirstAlbumDateRange[1]))
 	firstAlbumSliderMin.SetValue(core.FirstAlbumDateValue[0])
 	firstAlbumSliderMax := widget.NewSlider(float64(core.FirstAlbumDateRange[0]), float64(core.FirstAlbumDateRange[1]))
 	firstAlbumSliderMax.SetValue(core.FirstAlbumDateValue[1])
 
+	// Nombre de membres
 	numberOfMembersSliderMin := widget.NewSlider(float64(core.NumberOfMembersRange[0]), float64(core.NumberOfMembersRange[1]))
 	numberOfMembersSliderMin.SetValue(core.NumberOfMembersValue[0])
 	numberOfMembersSliderMax := widget.NewSlider(float64(core.NumberOfMembersRange[0]), float64(core.NumberOfMembersRange[1]))
 	numberOfMembersSliderMax.SetValue(core.NumberOfMembersValue[1])
 
+	// Les labels avec les valeurs des sliders
 	creationDateLabel := widget.NewLabel(fmt.Sprintf("Creation Date Range: %d - %d", int(core.CreationDateValue[0]), int(core.CreationDateValue[1])))
 	firstAlbumLabel := widget.NewLabel(fmt.Sprintf("First Album Date Range: %d - %d", int(core.FirstAlbumDateValue[0]), int(core.FirstAlbumDateValue[1])))
 	numberOfMembersLabel := widget.NewLabel(fmt.Sprintf("Number of Members Range: %d - %d", int(core.NumberOfMembersValue[0]), int(core.NumberOfMembersValue[1])))
 
-	locations := container.NewGridWithColumns(1)
+	locations := container.NewVBox()
 	var locsCheck []*widget.Check
-	updateLabels := func() {
+
+	// Fonction qui met à jour les valeurs pour le filtrage et des labels
+	updateFilters := func() {
 		core.CreationDateValue[0] = creationDateSliderMin.Value
 		core.CreationDateValue[1] = creationDateSliderMax.Value
 		core.FirstAlbumDateValue[0] = firstAlbumSliderMin.Value
@@ -117,62 +150,80 @@ func LoadMainPage(myWindow fyne.Window) {
 		firstAlbumLabel.SetText(fmt.Sprintf("First Album Date Range: %d - %d", int(firstAlbumSliderMin.Value), int(firstAlbumSliderMax.Value)))
 		numberOfMembersLabel.SetText(fmt.Sprintf("Number of Members Range: %d - %d", int(numberOfMembersSliderMin.Value), int(numberOfMembersSliderMax.Value)))
 	}
+
+	// Pour tout les pays possible, on crée un item checkbox
 	for _, location := range core.LocationsCountry {
 		name := core.FirstLetterUpper(location)
 		check := widget.NewCheck(name, func(checked bool) {
-			updateLabels()
+			updateFilters()
 		})
+
+		// Si le pays était déjà cocher, on le recoche
 		if core.ContainsString(core.LocationsCountryChecked, name) {
 			check.SetChecked(true)
 		}
+
 		locsCheck = append(locsCheck, check)
 	}
-	updateLabels()
+
+	updateFilters()
+
+	// On ajoute tout les checkbox des pays dans le container 'locations'
 	for _, locsCheck := range locsCheck {
 		locations.Add(locsCheck)
 	}
 	lab := widget.NewLabel("\n\n\n\n\n\n\n")
+
+	// Container final des locations pour les filtres
 	locationsContainer := container.NewVBox(widget.NewLabel("Locations"), container.NewHBox(lab, container.NewVScroll(locations)))
 
+	// Effectuer une recherche pour avoir des résultats au démarrage
 	performSearch()
 
+	// A chaque changement de valeurs dans sliders on lance la fonction 'updateFilters'
 	creationDateSliderMin.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if creationDateSliderMin.Value >= creationDateSliderMax.Value {
 			creationDateSliderMin.SetValue(creationDateSliderMax.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 	creationDateSliderMax.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if creationDateSliderMax.Value <= creationDateSliderMin.Value {
 			creationDateSliderMax.SetValue(creationDateSliderMin.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 
 	firstAlbumSliderMin.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if firstAlbumSliderMin.Value >= firstAlbumSliderMax.Value {
 			firstAlbumSliderMin.SetValue(firstAlbumSliderMax.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 	firstAlbumSliderMax.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if firstAlbumSliderMax.Value <= firstAlbumSliderMin.Value {
 			firstAlbumSliderMax.SetValue(firstAlbumSliderMin.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 
 	numberOfMembersSliderMin.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if numberOfMembersSliderMin.Value >= numberOfMembersSliderMax.Value {
 			numberOfMembersSliderMin.SetValue(numberOfMembersSliderMax.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 	numberOfMembersSliderMax.OnChanged = func(value float64) {
+		// Vérifie que la valeur min est <= à la valeur max, sinon on bloque
 		if numberOfMembersSliderMax.Value <= numberOfMembersSliderMin.Value {
 			numberOfMembersSliderMax.SetValue(numberOfMembersSliderMin.Value)
 		}
-		updateLabels()
+		updateFilters()
 	}
 
 	creationDateContainer := container.NewVBox(creationDateLabel, creationDateSliderMin, creationDateSliderMax)
@@ -181,8 +232,9 @@ func LoadMainPage(myWindow fyne.Window) {
 	applyButton := widget.NewButton("Apply Filters", func() {
 		performSearch()
 	})
+
+	// Bouton qui reset les valeurs des filtres et effectue une recherche automatiquement après
 	resetButton := widget.NewButton("Reset Filters", func() {
-		// Ici, vous pouvez maintenant accéder directement aux variables
 		creationDateSliderMin.SetValue(float64(core.CreationDateRange[0]))
 		creationDateSliderMax.SetValue(float64(core.CreationDateRange[1]))
 		firstAlbumSliderMin.SetValue(float64(core.FirstAlbumDateRange[0]))
@@ -217,6 +269,7 @@ func LoadMainPage(myWindow fyne.Window) {
 		bottomContainer,
 	))
 
+	// Les artists favoris
 	favoriteContainer := container.NewVBox()
 	favoritesLabel := canvas.NewText("Favorites:", color.White)
 	favoritesLabel.TextSize = 30
@@ -242,6 +295,7 @@ func LoadMainPage(myWindow fyne.Window) {
 		}
 		favoriteContainer.Add(favorites)
 	}
+
 	final := container.NewVBox(content, favoriteContainer)
 	myWindow.SetContent(container.NewVScroll(final))
 }

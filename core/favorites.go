@@ -24,6 +24,7 @@ func RemoveFavorite(artist int) {
 	}
 }
 
+// Sauvegarde les artistes favoris dans le fichier
 func SaveFavorites() error {
 	jsonBytes, err := json.Marshal(Favorites)
 	if err != nil {

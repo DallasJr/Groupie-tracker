@@ -13,8 +13,13 @@ import (
 )
 
 func Load() {
+	// Load favorite artists from local data file
 	LoadFavorites()
+
+	// Load the artists from API
 	LoadArtists()
+
+	// Load artists concerts locations and dates from API
 	loadLocations()
 	loadDate()
 	loadRelations()
@@ -24,7 +29,11 @@ const FavFile = "favs.json"
 
 func LoadFavorites() {
 	fmt.Println("Loading Favorites")
+
+	// Vérifier l'existance du fichier .json
 	if _, err := os.Stat(FavFile); err == nil {
+
+		// Ouvrir et lire le fichier
 		file, err := os.Open(FavFile)
 		if err != nil {
 			return
@@ -34,12 +43,15 @@ func LoadFavorites() {
 		if err != nil {
 			return
 		}
+
+		// Déccoder les données JSON et stocker dans Favorites
 		err = json.Unmarshal(jsonBytes, &Favorites)
 		if err != nil {
 			return
 		}
 		fmt.Println("Loaded favorites file")
 		return
+
 	} else if os.IsNotExist(err) {
 		fmt.Println("Data file doesn't exist yet")
 	} else {
@@ -72,12 +84,21 @@ func LoadArtists() {
 		fmt.Println("Erreur lors du décodage des données JSON :", err)
 		return
 	}
+
 	fmt.Println("Loading artists images")
 	for _, artist := range structs.Artists {
+
+		// Récuperer les valeurs min et max
 		InitializeFiltersValues(artist, true)
+
+		// On charge les images des artistes et les stock dans la map artist/image ImageArtist
 		go structs.StoreArtistImage(artist)
+
 	}
+
+	// Défini les valeurs par défaut
 	InitializeFiltersValues(structs.Artist{}, false)
+
 }
 
 func loadLocations() {
@@ -114,14 +135,21 @@ func loadLocations() {
 		// Assigner les locations à l'artiste correspondant
 		structs.Artists[i].Locations = locations.Locations
 	}
+
 	fmt.Println("Loading Map images")
 	for _, loc := range allLocations {
+
+		// Récupère et format les noms des pays pour les checkbox des filtres
 		_, country := structs.GetFormattedLocationName(loc)
 		if !ContainsString(LocationsCountry, strings.ToLower(country)) {
 			LocationsCountry = append(LocationsCountry, strings.ToLower(country))
 		}
+
+		// Charge les images de map et les stock dans la map artist/image ImageMap
 		//go structs.GenerateMapImage(loc)
 	}
+
+	// Trie par ordre alphabétique
 	sort.Strings(LocationsCountry)
 }
 

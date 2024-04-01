@@ -18,6 +18,7 @@ var LocationsCountry []string
 var LocationsCountryChecked []string
 
 func InitializeFiltersValues(artist structs.Artist, loop bool) {
+	// Récuperer les valeurs min et max
 	if loop {
 		if CreationDateRange[0] == 0 {
 			CreationDateRange[0] = artist.CreationDate
@@ -50,6 +51,8 @@ func InitializeFiltersValues(artist structs.Artist, loop bool) {
 			}
 		}
 	} else {
+
+		// Défini les valeurs par défaut
 		CreationDateValue[0] = float64(CreationDateRange[0])
 		CreationDateValue[1] = float64(CreationDateRange[1])
 		FirstAlbumDateValue[0] = float64(FirstAlbumDateRange[0])
