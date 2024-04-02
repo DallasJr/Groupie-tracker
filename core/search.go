@@ -87,7 +87,9 @@ func GetSuggestions(query string) []string {
 		return suggestions
 	}
 
-	for _, artist := range structs.Artists {
+	filteredArtists := GetFiltered(structs.Artists)
+
+	for _, artist := range filteredArtists {
 		matches := make(map[string]bool) // Pour garder une trace des types de correspondances trouvées
 
 		if strings.Contains(strings.ToLower(artist.Name), strings.ToLower(query)) {
