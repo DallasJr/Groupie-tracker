@@ -146,9 +146,7 @@ func loadLocations() {
 		}
 
 		// Charge les images de map et les stock dans la map artist/image ImageMap
-		if !structs.Disabled {
-			go structs.GenerateMapImage(loc)
-		}
+		go structs.GenerateMapImage(loc)
 	}
 
 	// Trie par ordre alphabétique
