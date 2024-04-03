@@ -15,7 +15,8 @@ import (
 const width = 300
 const height = 300
 const zoom = 4
-const apiKey = "fe25758143ce4092bc9eedf411dab42a"
+const apiKey = "b4110a75f3ed466d8ee295c29da92f87"
+const Disabled = true
 
 var ImageMap map[string]*canvas.Image
 

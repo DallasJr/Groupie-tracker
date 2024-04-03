@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func LoadMainPage(myWindow fyne.Window) {
+func LoadMainPage(myApp fyne.App, myWindow fyne.Window) {
 	titleLabel := canvas.NewText("          Groupie Tracker          ", color.White)
 	titleLabel.TextSize = 50
 
@@ -71,7 +71,7 @@ func LoadMainPage(myWindow fyne.Window) {
 
 			// Le bouton rédirige vers le profile de l'artiste
 			button := widget.NewButton("", func() {
-				LoadArtistPage(art, myWindow)
+				LoadArtistPage(myApp, art, myWindow)
 			})
 
 			// Le bouton est transparent de base et visible quand on a le curseur dessus
@@ -295,7 +295,7 @@ func LoadMainPage(myWindow fyne.Window) {
 			card := widget.NewCard("", "", container.NewVBox(image, container.NewCenter(artistLabel)))
 
 			button := widget.NewButton("", func() {
-				LoadArtistPage(artist, myWindow)
+				LoadArtistPage(myApp, artist, myWindow)
 			})
 			button.Importance = widget.LowImportance
 			button.SetIcon(theme.NavigateNextIcon())

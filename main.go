@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"groupie-tracker/core"
 	"groupie-tracker/pages"
+	"groupie-tracker/structs"
 )
 
 const resX = 1280
@@ -15,14 +16,16 @@ func main() {
 
 	fmt.Println("Launching app . . .")
 
+	myApp := app.New()
+	structs.InitializeSpotify()
+
 	// Load les Artists depuis l'API
 	core.Load()
 
-	myApp := app.New()
 	myWindow := myApp.NewWindow("Groupie Tracker")
 
 	// Récuperer le contenu de la page principale
-	pages.LoadMainPage(myWindow)
+	pages.LoadMainPage(myApp, myWindow)
 
 	myWindow.Resize(fyne.NewSize(resX, resY))
 	myWindow.ShowAndRun()

@@ -10,12 +10,13 @@ import (
 	"groupie-tracker/core"
 	"groupie-tracker/structs"
 	"image/color"
+	"net/url"
 	"strconv"
 )
 
-func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
+func LoadArtistPage(myApp fyne.App, artist structs.Artist, myWindow fyne.Window) {
 	homeButton := widget.NewButton("Home", func() {
-		LoadMainPage(myWindow)
+		LoadMainPage(myApp, myWindow)
 	})
 
 	var favButton *widget.Button
@@ -45,10 +46,11 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 
 	picture := artist.GetImage()
 	picture.FillMode = canvas.ImageFillContain
-	picture.SetMinSize(fyne.NewSize(150, 150))
+	picture.SetMinSize(fyne.NewSize(300, 300))
 
 	artistLabel := canvas.NewText(artist.Name, color.White)
-	artistLabel.TextSize = 20
+	artistLabel.TextStyle = fyne.TextStyle{Bold: true}
+	artistLabel.TextSize = 30
 
 	title := container.NewGridWithColumns(4, layout.NewSpacer(), picture, container.NewCenter(artistLabel), layout.NewSpacer())
 
@@ -85,6 +87,7 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 			concertCard.Add(structs.GetMapImage(location))
 			city, country := structs.GetFormattedLocationName(location)
 			locationText := canvas.NewText(city+" "+country, color.White)
+			locationText.TextStyle = fyne.TextStyle{Bold: true}
 			locationText.TextSize = 20
 			concertCard.Add(container.NewCenter(locationText))
 			datesLabel := widget.NewLabel("Dates:")
@@ -103,8 +106,46 @@ func LoadArtistPage(artist structs.Artist, myWindow fyne.Window) {
 		concertsContainer.Add(noConcerts)
 		concertsContainer.Add(widget.NewSeparator())
 	}
+	topTracksContainer := container.NewVBox()
+	topTracksLabel := canvas.NewText("Top Tracks:", color.White)
+	topTracksLabel.TextSize = 50
+	topTracksContainer.Add(container.NewCenter(topTracksLabel))
+	spotifyLabel := canvas.NewText("from Spotify", color.CMYK{C: 80, Y: 80})
+	spotifyLabel.TextSize = 20
+	topTracksContainer.Add(container.NewCenter(spotifyLabel))
+	if len(structs.ArtistsSpotifyDatas[artist.ID].TopTracks) > 0 {
+		tracks := container.NewGridWithColumns(2)
+		for _, track := range structs.ArtistsSpotifyDatas[artist.ID].TopTracks {
+			nameText := canvas.NewText(track.Name, color.White)
+			nameText.TextStyle = fyne.TextStyle{Bold: true}
+			nameText.TextSize = 20
+			indexText := canvas.NewText(strconv.Itoa(len(tracks.Objects)+1), color.White)
+			indexText.TextStyle = fyne.TextStyle{Bold: true}
+			indexText.TextSize = 18
+			dateText := canvas.NewText(track.Date, color.White)
+			dateText.TextSize = 18
+			card := widget.NewCard("", "", container.NewVBox(container.NewCenter(indexText), track.Image, container.NewCenter(nameText), container.NewCenter(dateText)))
+			button := widget.NewButton("", func() {
+				u, _ := url.Parse(track.URL)
+				_ = myApp.OpenURL(u)
+			})
+			button.Importance = widget.LowImportance
+			button.SetIcon(theme.NavigateNextIcon())
+			finalCard := container.New(layout.NewBorderLayout(nil, nil, nil, nil),
+				card,
+				container.NewGridWithColumns(3, layout.NewSpacer(), button, layout.NewSpacer()))
+			tracks.Add(finalCard)
+		}
+		topTracksContainer.Add(tracks)
+		topTracksContainer.Add(widget.NewSeparator())
+	} else {
+		noTracks := canvas.NewText("No tracks", color.White)
+		noTracks.TextSize = 20
+		topTracksContainer.Add(noTracks)
+		topTracksContainer.Add(widget.NewSeparator())
+	}
 
-	content := container.NewVScroll(container.NewVBox(buttonContainer, title, membersList, datesContainer, concertsContainer))
+	content := container.NewVScroll(container.NewVBox(buttonContainer, title, membersList, datesContainer, concertsContainer, topTracksContainer))
 	myWindow.SetContent(content)
 }
 

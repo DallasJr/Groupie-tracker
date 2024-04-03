@@ -85,12 +85,13 @@ func LoadArtists() {
 		return
 	}
 
-	fmt.Println("Loading artists images")
+	fmt.Println("Loading artists images and spotify data")
+	structs.ArtistsSpotifyDatas = make(map[int]structs.SpotifyData)
 	for _, artist := range structs.Artists {
-
 		// Récuperer les valeurs min et max
 		InitializeFiltersValues(artist, true)
 
+		go structs.LoadSpotifyData(artist)
 		// On charge les images des artistes et les stock dans la map artist/image ImageArtist
 		go structs.StoreArtistImage(artist)
 
@@ -98,7 +99,6 @@ func LoadArtists() {
 
 	// Défini les valeurs par défaut
 	InitializeFiltersValues(structs.Artist{}, false)
-
 }
 
 func loadLocations() {
@@ -146,7 +146,9 @@ func loadLocations() {
 		}
 
 		// Charge les images de map et les stock dans la map artist/image ImageMap
-		//go structs.GenerateMapImage(loc)
+		if !structs.Disabled {
+			go structs.GenerateMapImage(loc)
+		}
 	}
 
 	// Trie par ordre alphabétique
